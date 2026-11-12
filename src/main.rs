@@ -190,7 +190,11 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
     line(d, &format!("Modo: {mode}   Velocidad: {:.1} u/s", game.ship.speed()), 18, white);
     line(d, &format!("Cerca de: {}   altura: {:.1} u", body.name, alt.max(0.0)), 18, white);
     if let Some(t) = game.autopilot {
-        line(d, &format!("Viajando a {}", game.system.bodies[t].name), 18, Color::GOLD);
+        line(d, &format!("Viajando a {} (cualquier tecla de vuelo lo cancela)", game.system.bodies[t].name), 18, Color::GOLD);
+    }
+    if let Mode::Local(lo) = game.mode {
+        let b = &game.system.bodies[lo.body];
+        line(d, &format!("{}: {}", b.name, b.description()), 16, Color::new(150, 220, 255, 255));
     }
     if game.gravity_on {
         line(d, &format!("Gravedad: {:.2} u/s2", game.gravity.length()), 16, gray);
