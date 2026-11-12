@@ -148,4 +148,15 @@ mod tests {
         assert!((Serpent::head_length(CYCLE * 0.5) - full).abs() < 1e-4);
         assert!(Serpent::head_length(CYCLE * 0.999) < 0.01);
     }
+
+    #[test]
+    fn la_curva_sale_del_suelo_y_sube() {
+        assert!(Serpent::curve(0.0, 3.0).length() < 1e-4);
+        let mut prev = 0.0;
+        for k in 1..20 {
+            let h = Serpent::curve(k as f32 * 0.07, 3.0).y;
+            assert!(h > prev);
+            prev = h;
+        }
+    }
 }
