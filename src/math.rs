@@ -187,4 +187,13 @@ mod tests {
         // En la vista la cámara mira hacia -Z.
         assert!(close(p, Vector3::new(0.0, 0.0, -5.0)));
     }
+
+    #[test]
+    fn perspectiva_manda_near_y_far_a_menos_uno_y_uno() {
+        let p = perspective(1.0, 1.0, 0.5, 100.0);
+        let near = transform(&p, Vector3::new(0.0, 0.0, -0.5), 1.0);
+        let far = transform(&p, Vector3::new(0.0, 0.0, -100.0), 1.0);
+        assert!((near[2] / near[3] + 1.0).abs() < 1e-4);
+        assert!((far[2] / far[3] - 1.0).abs() < 1e-3);
+    }
 }
