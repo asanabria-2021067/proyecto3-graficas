@@ -43,6 +43,9 @@ fn script() -> Vec<Step> {
         Step::Orbit(3.0, c(0.8, -0.25, 0.0, 0.0, false)),
         Step::Orbit(3.0, c(0.6, 0.0, 0.0, 1.0, false)),
         Step::Leave,
+        Step::Goto(7), // Nix, la luna
+        Step::Sunward(5.0),
+        Step::Leave,
         Step::Fly(3.0, c(1.0, 0.0, 0.25, 0.0, true)),
         Step::Goto(6), // Mirra
         Step::Sunward(6.0),
