@@ -18,12 +18,13 @@ struct Shot {
     distance: f32, // distancia de la cámara a la nave
 }
 
-const SHOTS: [Shot; 6] = [
+const SHOTS: [Shot; 7] = [
     Shot { name: "ignis", body: 1, lat: 10.0, lon: -40.0, alt: 0.45, heading: 0.0, time: 20.0, distance: 4.5 },
     Shot { name: "tessara", body: 2, lat: 20.0, lon: -60.0, alt: 0.35, heading: 30.0, time: 30.0, distance: 4.5 },
     Shot { name: "kharon", body: 3, lat: -15.0, lon: -30.0, alt: 0.35, heading: 80.0, time: 40.0, distance: 4.2 },
     Shot { name: "glacia", body: 4, lat: 35.0, lon: -50.0, alt: 0.4, heading: 10.0, time: 50.0, distance: 4.5 },
     Shot { name: "orvane", body: 5, lat: 18.0, lon: -40.0, alt: 0.5, heading: 60.0, time: 60.0, distance: 6.0 },
+    Shot { name: "mirra", body: 6, lat: 25.0, lon: -35.0, alt: 0.55, heading: 20.0, time: 25.0, distance: 3.4 },
     Shot { name: "tessara_superficie", body: 2, lat: 25.0, lon: -70.0, alt: 0.1, heading: 40.0, time: 30.0, distance: 3.2 },
 ];
 
@@ -52,6 +53,10 @@ fn place(game: &mut Game, s: &Shot) {
 }
 
 pub fn run(filter: Option<&str>) {
+    if filter == Some("rendimiento") {
+        benchmark();
+        return;
+    }
     let noise = OpenSimplex::new(7);
     let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
     let renderer = Renderer::new(noise.clone());
@@ -73,6 +78,35 @@ pub fn run(filter: Option<&str>) {
         println!("{path}: {} triangulos, local={mode}", report.stats.triangles_drawn);
     }
 
+    if wanted("serpiente") {
+        // La nave se pone detrás de la serpiente (un poco más al norte) mirando hacia ella.
+        let mut game = Game::new(noise.clone());
+        let t = 24.0;
+        game.orbit_time = t;
+        game.time = t;
+        let s = &meshes.serpent;
+        let b = &game.system.bodies[s.body];
+        let so = b.shade_object(t);
+        let up = so.to_world(s.dir);
+        let (east, _) = crate::decor::tangent_frame(up);
+        let side = crate::math::rotate_axis(up, east, -0.5);
+        let r = b.radius();
+        game.ship.pos = so.center + side * (r * 1.32);
+        game.ship.up = side;
+        game.ship.forward = crate::math::reject(so.center + up * (r * 1.25) - game.ship.pos, side).normalized();
+        game.enter_local(s.body);
+        game.camera.distance = 5.5;
+        game.camera.local = true;
+        game.camera.snap(&game.ship);
+        game.settings.minimap = false;
+        for _ in 0..10 {
+            game.update(&Input::default(), 1.0 / 30.0);
+        }
+        renderer.render(&mut fb, &meshes, &game.frame());
+        fb.save_png("docs/serpiente.png");
+        println!("docs/serpiente.png");
+    }
+
     if wanted("sistema") {
         let mut game = Game::new(noise.clone());
         game.orbit_time = 12.0;
@@ -82,4 +116,48 @@ pub fn run(filter: Option<&str>) {
         fb.save_png("docs/sistema.png");
         println!("docs/sistema.png");
     }
+}
+
+/// `cargo run --release -- capture rendimiento`: compara el trabajo del renderizador con y sin
+/// descarte y niveles de detalle, y lo guarda en docs/rendimiento.md.
+pub fn benchmark() {
+    let noise = OpenSimplex::new(7);
+    let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
+    let renderer = Renderer::new(noise.clone());
+    let mut fb = Framebuffer::new(640, 360);
+    let mut out = String::from(
+        "# Rendimiento: descarte y niveles de detalle\n\n\
+         Generado con `cargo run --release -- capture rendimiento` (640x360, promedio de 5 cuadros).\n\
+         \"Triángulos enviados\" son los que llegan al pipeline; los objetos descartados no mandan ninguno.\n\n",
+    );
+    let scenes: [(&str, Option<usize>); 3] = [("Sobre Tessara (superficie)", Some(5)), ("Cerca de Kharon", Some(2)), ("Inicio, en el espacio", None)];
+    for (title, shot) in scenes {
+        out.push_str(&format!("## {title}\n\n| Descarte | LOD | Objetos dibujados | Objetos descartados | Triángulos enviados | Triángulos rasterizados | ms por cuadro |\n|---|---|---|---|---|---|---|\n"));
+        for (culling, lod) in [(true, true), (false, true), (true, false), (false, false)] {
+            let mut game = Game::new(noise.clone());
+            if let Some(i) = shot {
+                place(&mut game, &SHOTS[i]);
+            }
+            game.settings.culling = culling;
+            game.settings.lod = lod;
+            for _ in 0..15 {
+                game.update(&Input::default(), 1.0 / 30.0);
+            }
+            let mut report = renderer.render(&mut fb, &meshes, &game.frame());
+            let start = std::time::Instant::now();
+            for _ in 0..5 {
+                report = renderer.render(&mut fb, &meshes, &game.frame());
+            }
+            let ms = start.elapsed().as_secs_f32() * 1000.0 / 5.0;
+            let s = report.stats;
+            let yn = |b: bool| if b { "sí" } else { "no" };
+            out.push_str(&format!(
+                "| {} | {} | {} | {} | {} | {} | {:.1} |\n",
+                yn(culling), yn(lod), s.objects, s.objects_culled, s.triangles_in, s.triangles_drawn, ms
+            ));
+        }
+        out.push('\n');
+    }
+    std::fs::write("docs/rendimiento.md", &out).expect("no se pudo escribir docs/rendimiento.md");
+    println!("{out}");
 }
