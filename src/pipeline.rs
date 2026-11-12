@@ -252,14 +252,15 @@ mod tests {
     }
 
     #[test]
-    fn la_mitad_de_la_esfera_esta_de_espaldas() {
+    fn mas_de_la_mitad_de_la_esfera_esta_de_espaldas() {
         let mesh = geometry::icosphere(3);
         let mut fb = Framebuffer::new(64, 64);
         let mut st = Stats::default();
         draw(&mut fb, &camera(), &call(&mesh, math::identity()), &mut st);
-        let half = mesh.indices.len() as f32 / 2.0;
-        assert!((st.triangles_back as f32 - half).abs() < half * 0.15);
-        assert!(st.triangles_drawn > 0);
+        // Desde cerca se ve menos de medio planeta: cos(ángulo) = 1/4, o sea 37.5 % de frente.
+        let total = mesh.indices.len() as f32;
+        assert!(st.triangles_back as f32 > total * 0.55);
+        assert!(st.triangles_drawn as f32 > total * 0.3);
     }
 
     #[test]
