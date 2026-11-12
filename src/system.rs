@@ -127,3 +127,18 @@ impl System {
             .fold((0, f32::MAX), |a, b| if b.1 < a.1 { b } else { a })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn todos_en_el_plano_ecliptico() {
+        let s = System::new();
+        for b in &s.bodies {
+            for t in [0.0, 13.0, 200.0] {
+                assert_eq!(b.center(t).y, 0.0);
+            }
+        }
+    }
+}
