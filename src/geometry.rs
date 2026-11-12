@@ -156,4 +156,14 @@ mod tests {
         let m = deform(&icosphere(2), |d| 1.0 + d.y.max(0.0) * 0.5);
         assert!((m.radius - 1.5).abs() < 0.05);
     }
+
+    #[test]
+    fn anillo_entre_los_dos_radios() {
+        let m = ring(1.0, 2.0, 32);
+        assert_eq!(m.indices.len(), 64);
+        for v in &m.vertices {
+            let r = v.position.length();
+            assert!((0.999..=2.001).contains(&r));
+        }
+    }
 }
