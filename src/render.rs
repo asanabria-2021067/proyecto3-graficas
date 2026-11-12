@@ -294,7 +294,7 @@ impl Renderer {
             }
         });
 
-        self.background.draw_stars(fb, &vp);
+        self.background.draw_stars(fb, &vp, f.time);
         overlay::trail(fb, &vp, f.trail);
         if f.settings.orbits {
             overlay::orbits(fb, &vp, f.system, t, f.highlight);
