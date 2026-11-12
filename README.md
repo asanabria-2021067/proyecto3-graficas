@@ -181,3 +181,20 @@ Al arrancar se generan dos texturas de normales (roca y hielo agrietado) a parti
 | `assets/` | Nave (del lab 5) y modelos de la superficie con sus materiales |
 
 La nave es la de los labs 4 y 5, y los shaders del sol, Tessara y Orvane salen del lab 6 (adaptados: Tessara ahora usa el mapa de normales en vez de derivar el ruido en cada píxel).
+
+---
+
+## Pruebas
+
+```bash
+cargo test --release
+```
+
+Hay 60+ pruebas unitarias de las partes que se pueden revisar sin ventana: matrices y rotaciones, el generador con semilla, la subdivisión (sin vértices repetidos ni caras al revés), el descarte por planos, el depth test y el recorte cercano del pipeline, la carga de los `.obj`, las órbitas, la distribución reproducible de objetos, la física de la nave (también que responda igual a 30 y a 144 FPS), el modo local, el piloto automático hacia cada planeta y la colisión.
+
+## Rendimiento
+
+La tabla completa está en [docs/rendimiento.md](docs/rendimiento.md). Ahí se compara cuántos objetos y triángulos llegan al pipeline con el descarte y los niveles de detalle encendidos o apagados. En el juego se puede ver lo mismo con las teclas **C** y **L** y los contadores de abajo.
+
+Los fragment shaders corren en paralelo con `rayon`, así que entre más núcleos tenga la computadora, más FPS. Si va lento, **F1** baja la resolución interna.
+
