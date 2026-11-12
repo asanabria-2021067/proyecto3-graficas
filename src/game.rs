@@ -148,7 +148,11 @@ impl Game {
         }
         self.camera.look_yaw += input.look.0;
         self.camera.look_pitch = (self.camera.look_pitch + input.look.1).clamp(-1.2, 1.2);
-        self.camera.distance = (self.camera.distance - input.zoom * 0.4).clamp(2.2, 14.0);
+        if self.camera.overview {
+            self.camera.overview_zoom = (self.camera.overview_zoom * (1.0 - input.zoom * 0.08)).clamp(0.3, 1.6);
+        } else {
+            self.camera.distance = (self.camera.distance - input.zoom * 0.4).clamp(2.2, 14.0);
+        }
         self.camera.update(&self.ship, ground, dt);
     }
 
