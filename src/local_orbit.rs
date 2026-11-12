@@ -112,4 +112,14 @@ mod tests {
         // En algún momento estuvo del otro lado del planeta.
         assert!(minimo < -0.9);
     }
+
+    #[test]
+    fn nunca_baja_del_suelo() {
+        let mut lo = orbita();
+        let c = Controls { lift: -1.0, thrust: 0.5, ..Default::default() };
+        for _ in 0..120 * 10 {
+            lo.step(&c, 6.0, 1.0 / 120.0);
+        }
+        assert!(lo.alt >= min_altitude(6.0) - 1e-4);
+    }
 }
