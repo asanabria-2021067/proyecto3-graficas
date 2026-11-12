@@ -71,3 +71,15 @@ pub fn toon(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
     color = mix(color, rgb(1.0, 0.85, 0.6), rim * 0.35);
     mix(color, rgb(0.05, 0.03, 0.10), smoothstep(0.16, 0.08, facing))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn el_camino_pasa_por_el_ecuador_en_x() {
+        // En lat = 0 la espiral está en lon = 0, o sea el punto (1, 0, 0).
+        assert!(on_path(Vector3::new(1.0, 0.0, 0.0)));
+        assert!(!on_path(Vector3::new(-1.0, 0.0, 0.0)));
+    }
+}
