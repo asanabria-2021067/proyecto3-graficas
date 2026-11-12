@@ -4,7 +4,11 @@ Sistema solar inventado que se explora con una nave, dibujado con un **software 
 
 ![recorrido](docs/recorrido.gif)
 
-🎬 **Video completo:** [docs/recorrido.mp4](docs/recorrido.mp4): vuelo por el espacio, llegada a Tessara, vuelta junto a la serpiente de roca, paso por la luna Nix, visita a Mirra y a Orvane, salida y vista del sistema.
+### 🎬 Video del recorrido (1080p)
+
+[![Ver el video del recorrido](docs/miniatura_video.png)](docs/recorrido.mp4)
+
+Vuelo por el espacio, llegada a Tessara, vuelta junto a la serpiente de roca, paso por la luna Nix, visita a Mirra y a Orvane, salida y vista del sistema. Clic en la imagen para verlo (archivo: [docs/recorrido.mp4](docs/recorrido.mp4)).
 
 | Vista del sistema | Superficie de Tessara |
 |---|---|
