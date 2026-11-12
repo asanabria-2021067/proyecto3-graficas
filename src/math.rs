@@ -179,4 +179,12 @@ mod tests {
         let a = 0.7;
         assert!(close(rotate_axis(v, Vector3::new(0.0, 1.0, 0.0), a), rotate_y(v, a)));
     }
+
+    #[test]
+    fn look_at_deja_el_objetivo_enfrente() {
+        let view = look_at(Vector3::new(0.0, 0.0, 5.0), Vector3::zero(), Vector3::new(0.0, 1.0, 0.0));
+        let p = transform_point(&view, Vector3::zero());
+        // En la vista la cámara mira hacia -Z.
+        assert!(close(p, Vector3::new(0.0, 0.0, -5.0)));
+    }
 }
