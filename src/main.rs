@@ -20,6 +20,7 @@ mod serpent;
 mod shaders;
 mod ship;
 mod system;
+mod tour;
 
 use framebuffer::Framebuffer;
 use game::{Game, Input, Mode};
@@ -74,6 +75,11 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     if let Some(i) = args.iter().position(|a| a == "capture") {
         capture::run(args.get(i + 1).map(|s| s.as_str()));
+        return;
+    }
+    if args.iter().any(|a| a == "tour") {
+        let save = !args.iter().any(|a| a == "--sin-cuadros");
+        tour::run(960, 540, save);
         return;
     }
     let noise = OpenSimplex::new(7);
