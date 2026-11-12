@@ -287,4 +287,15 @@ mod tests {
         draw(&mut fb, &camera(), &call(&mesh, model), &mut st);
         assert!(fb.gbuf.iter().all(|s| s.id == 1));
     }
+
+    #[test]
+    fn la_prueba_de_transparencia_descarta_pixeles() {
+        let mesh = geometry::icosphere(2);
+        let mut fb = Framebuffer::new(64, 64);
+        let mut st = Stats::default();
+        let solo_arriba: fn(Vector3) -> bool = |p| p.y > 0.0;
+        draw(&mut fb, &camera(), &DrawCall { alpha: Some(solo_arriba), ..call(&mesh, math::identity()) }, &mut st);
+        assert_eq!(fb.gbuf[24 * 64 + 32].id, 1); // arriba del centro
+        assert_eq!(fb.gbuf[40 * 64 + 32].id, 0); // abajo: descartado
+    }
 }
