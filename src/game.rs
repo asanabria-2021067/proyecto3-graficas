@@ -320,4 +320,20 @@ mod tests {
             assert!((g.ship.pos - b.center(g.orbit_time)).length() >= b.radius());
         }
     }
+
+    #[test]
+    fn el_piloto_automatico_llega_a_cada_planeta() {
+        for target in 1..=6 {
+            let mut g = Game::new(OpenSimplex::new(7));
+            let mut input = Input { autopilot: Some(target), ..Default::default() };
+            for _ in 0..30 * 90 {
+                g.update(&input, 1.0 / 30.0);
+                input.autopilot = None;
+                if matches!(g.mode, Mode::Local(lo) if lo.body == target) {
+                    break;
+                }
+            }
+            assert!(matches!(g.mode, Mode::Local(lo) if lo.body == target), "no llegó a {}", g.system.bodies[target].name);
+        }
+    }
 }
