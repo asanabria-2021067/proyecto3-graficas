@@ -301,7 +301,8 @@ impl Game {
             ship_forward: self.ship.forward,
             trail: &self.trail,
             camera: self.camera.view,
-            settings: self.settings,
+            // En la vista del sistema el minimapa sobra: ya se ve todo desde arriba.
+            settings: Settings { minimap: self.settings.minimap && !self.camera.overview, ..self.settings },
             highlight: self.autopilot.or(match self.mode {
                 Mode::Local(lo) => Some(lo.body),
                 Mode::Free => None,
