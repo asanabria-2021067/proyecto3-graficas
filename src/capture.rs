@@ -18,13 +18,14 @@ struct Shot {
     distance: f32, // distancia de la cámara a la nave
 }
 
-const SHOTS: [Shot; 7] = [
+const SHOTS: [Shot; 8] = [
     Shot { name: "ignis", body: 1, lat: 10.0, lon: -40.0, alt: 0.45, heading: 0.0, time: 20.0, distance: 4.5 },
     Shot { name: "tessara", body: 2, lat: 20.0, lon: -60.0, alt: 0.35, heading: 30.0, time: 30.0, distance: 4.5 },
     Shot { name: "kharon", body: 3, lat: -15.0, lon: -30.0, alt: 0.35, heading: 80.0, time: 40.0, distance: 4.2 },
     Shot { name: "glacia", body: 4, lat: 35.0, lon: -50.0, alt: 0.4, heading: 10.0, time: 50.0, distance: 4.5 },
     Shot { name: "orvane", body: 5, lat: 18.0, lon: -40.0, alt: 0.5, heading: 60.0, time: 60.0, distance: 6.0 },
     Shot { name: "mirra", body: 6, lat: 25.0, lon: -35.0, alt: 0.55, heading: 20.0, time: 25.0, distance: 3.4 },
+    Shot { name: "nix", body: 7, lat: 15.0, lon: -50.0, alt: 1.2, heading: 70.0, time: 70.0, distance: 3.8 },
     Shot { name: "tessara_superficie", body: 2, lat: 25.0, lon: -70.0, alt: 0.1, heading: 40.0, time: 30.0, distance: 3.2 },
 ];
 
