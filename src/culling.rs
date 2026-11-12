@@ -51,3 +51,20 @@ impl Frustum {
         self.planes.iter().all(|p| p.distance(center) > -radius)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::math;
+
+    fn frustum() -> Frustum {
+        let view = math::look_at(Vector3::zero(), Vector3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 1.0, 0.0));
+        let proj = math::perspective(1.0, 1.0, 0.1, 100.0);
+        Frustum::from_matrix(&math::mul(&proj, &view))
+    }
+
+    #[test]
+    fn esfera_enfrente_se_ve() {
+        assert!(frustum().sphere_visible(Vector3::new(0.0, 0.0, -10.0), 1.0));
+    }
+}
