@@ -13,11 +13,11 @@ fi
 if [ $# -ge 1 ]; then
   # Con música: se corta al largo del video y se baja el volumen al final.
   ffmpeg -y -framerate 30 -i docs/frames/%05d.png -i "$1" \
-    -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p \
+    -c:v libx264 -preset veryfast -crf 27 -pix_fmt yuv420p \
     -c:a aac -b:a 160k -af "afade=t=out:st=72:d=4" -shortest docs/recorrido.mp4
 else
   ffmpeg -y -framerate 30 -i docs/frames/%05d.png \
-    -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p docs/recorrido.mp4
+    -c:v libx264 -preset veryfast -crf 27 -pix_fmt yuv420p docs/recorrido.mp4
 fi
 
 # GIF corto (la llegada a Tessara y la serpiente) para el README y Discord.
