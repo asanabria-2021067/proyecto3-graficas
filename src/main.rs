@@ -87,7 +87,7 @@ fn main() {
     let renderer = Renderer::new(noise.clone());
     let mut game = Game::new(noise);
 
-    let mut scale = 2usize; // 1 = resolución completa, 2 = mitad (más FPS)
+    let mut scale = 2usize; // 1 = resolución completa, 2 = mitad, 3 = un tercio
     let mut fb = Framebuffer::new(WIDTH as usize / scale, HEIGHT as usize / scale);
 
     if std::env::args().any(|a| a == "shot") {
@@ -119,7 +119,8 @@ fn main() {
             show_help = !show_help;
         }
         if rl.is_key_pressed(KeyboardKey::KEY_F1) {
-            scale = if scale == 1 { 2 } else { 1 };
+            // 1 = completa, 2 = mitad, 3 = un tercio (para computadoras lentas)
+            scale = scale % 3 + 1;
             fb = Framebuffer::new(WIDTH as usize / scale, HEIGHT as usize / scale);
             texture = make_texture(&mut rl, &fb);
         }
