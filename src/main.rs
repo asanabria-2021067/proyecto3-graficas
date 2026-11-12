@@ -84,7 +84,7 @@ fn main() {
     }
     let noise = OpenSimplex::new(7);
     let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
-    let renderer = Renderer::new(noise.clone());
+    let renderer = Renderer::new(noise);
     let mut game = Game::new(noise);
 
     let mut scale = 2usize; // 1 = resolución completa, 2 = mitad, 3 = un tercio

@@ -76,7 +76,7 @@ fn steer_to_serpent(game: &Game, meshes: &Meshes) -> Controls {
 pub fn run(width: usize, height: usize, save: bool) {
     let noise = OpenSimplex::new(7);
     let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
-    let renderer = Renderer::new(noise.clone());
+    let renderer = Renderer::new(noise);
     let mut game = Game::new(noise);
     let mut fb = Framebuffer::new(width, height);
     let _ = std::fs::remove_dir_all("docs/frames");

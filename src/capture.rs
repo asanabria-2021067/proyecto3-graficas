@@ -62,12 +62,12 @@ pub fn run(filter: Option<&str>) {
     }
     let noise = OpenSimplex::new(7);
     let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
-    let renderer = Renderer::new(noise.clone());
+    let renderer = Renderer::new(noise);
     let mut fb = Framebuffer::new(1280, 720);
     let wanted = |name: &str| filter.is_none_or(|f| name.contains(f));
 
     for s in SHOTS.iter().filter(|s| wanted(s.name)) {
-        let mut game = Game::new(noise.clone());
+        let mut game = Game::new(noise);
         place(&mut game, s);
         game.settings.minimap = false;
         // Medio segundo de simulación para que la cámara se acomode.
@@ -83,7 +83,7 @@ pub fn run(filter: Option<&str>) {
 
     if wanted("serpiente") {
         // La nave se pone detrás de la serpiente (un poco más al norte) mirando hacia ella.
-        let mut game = Game::new(noise.clone());
+        let mut game = Game::new(noise);
         let t = 24.0;
         game.orbit_time = t;
         game.time = t;
@@ -111,7 +111,7 @@ pub fn run(filter: Option<&str>) {
     }
 
     if wanted("sistema") {
-        let mut game = Game::new(noise.clone());
+        let mut game = Game::new(noise);
         game.orbit_time = 12.0;
         game.camera.overview = true;
         game.camera.snap(&game.ship);
@@ -126,7 +126,7 @@ pub fn run(filter: Option<&str>) {
 pub fn benchmark() {
     let noise = OpenSimplex::new(7);
     let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
-    let renderer = Renderer::new(noise.clone());
+    let renderer = Renderer::new(noise);
     let mut fb = Framebuffer::new(640, 360);
     let mut out = String::from(
         "# Rendimiento: descarte y niveles de detalle\n\n\
@@ -137,7 +137,7 @@ pub fn benchmark() {
     for (title, shot) in scenes {
         out.push_str(&format!("## {title}\n\n| Descarte | LOD | Objetos dibujados | Objetos descartados | Triángulos enviados | Triángulos rasterizados | ms por cuadro |\n|---|---|---|---|---|---|---|\n"));
         for (culling, lod) in [(true, true), (false, true), (true, false), (false, false)] {
-            let mut game = Game::new(noise.clone());
+            let mut game = Game::new(noise);
             if let Some(i) = shot {
                 place(&mut game, &SHOTS[i]);
             }
