@@ -11,6 +11,7 @@ use crate::mesh::Mesh;
 use crate::normal_map::NormalMaps;
 use crate::overlay;
 use crate::pipeline::{self, DrawCall, Stats};
+use crate::serpent::Serpent;
 use crate::shaders::{self, barren, ring, Globals, Material, ShadeObject};
 use crate::system::System;
 use noise::OpenSimplex;
@@ -36,6 +37,7 @@ pub struct Meshes {
     pub ring: Mesh,
     pub ship: Mesh,
     pub models: Models,
+    pub serpent: Serpent,
 }
 
 impl Meshes {
@@ -48,6 +50,7 @@ impl Meshes {
             ring: geometry::ring(ring::INNER, ring::OUTER, 160),
             ship: crate::obj::load("assets/nave.obj")?,
             models: Models::load()?,
+            serpent: Serpent::new(2, noise),
         })
     }
 }
@@ -178,6 +181,27 @@ impl Renderer {
                 objects[ID_RING as usize] = ro;
                 let call = DrawCall { mesh: &meshes.ring, model, id: ID_RING, double_sided: true, alpha: Some(ring::alpha) };
                 pipeline::draw(fb, &vp, &call, &mut report.stats);
+            }
+
+            // ---------- La serpiente de roca (solo en Tessara) ----------
+            if i == meshes.serpent.body && (!f.settings.lod || px > 40.0) {
+                let (bc, br) = meshes.serpent.bounds(body, &so);
+                if f.settings.culling && !frustum.sphere_visible(bc, br) {
+                    report.stats.objects_culled += 1;
+                } else {
+                    for part in meshes.serpent.parts(body, &so, f.time) {
+                        if f.settings.culling && !frustum.sphere_visible(part.center, part.radius) {
+                            report.stats.objects_culled += 1;
+                            continue;
+                        }
+                        let mut s = ShadeObject::new(Material::Serpent);
+                        s.center = so.center;
+                        s.intensity = part.param;
+                        objects.push(s);
+                        let id = objects.len() as u16 - 1;
+                        pipeline::draw(fb, &vp, &DrawCall { mesh: part.mesh, model: part.model, id, double_sided: false, alpha: None }, &mut report.stats);
+                    }
+                }
             }
 
             // ---------- Objetos de la superficie ----------
