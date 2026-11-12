@@ -1,0 +1,15 @@
+newmtl Pared
+Kd 0.860 0.800 0.680
+
+newmtl Techo
+Kd 0.620 0.160 0.100
+
+newmtl Puerta
+Kd 0.300 0.180 0.100
+
+newmtl Brillo_ventana
+Kd 1.000 0.780 0.380
+
+newmtl Chimenea
+Kd 0.400 0.360 0.340
+
