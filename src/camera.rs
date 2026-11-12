@@ -14,6 +14,8 @@ pub struct ChaseCamera {
     pub dragging: bool, // el mouse está girando la cámara
     pub local: bool,    // la nave está en modo local: la cámara mira más hacia el suelo
     pub altitude: f32,  // altura sobre el planeta en modo local
+    pub shake: f32,     // sacudida al chocar (se apaga sola)
+    clock: f32,
 }
 
 impl ChaseCamera {
@@ -27,6 +29,8 @@ impl ChaseCamera {
             dragging: false,
             local: false,
             altitude: 0.0,
+            shake: 0.0,
+            clock: 0.0,
         };
         c.snap(ship);
         c
@@ -71,6 +75,14 @@ impl ChaseCamera {
             if off.length() < r + 0.25 {
                 self.view.eye = c + off.normalized() * (r + 0.25);
             }
+        }
+        // Sacudida: senos con frecuencias distintas en cada eje, que se apagan rápido.
+        self.clock += dt;
+        if self.shake > 0.01 {
+            let c = self.clock;
+            let jitter = Vector3::new((c * 53.0).sin(), (c * 71.0).sin(), (c * 37.0).sin());
+            self.view.eye += jitter * (self.shake * 0.12);
+            self.shake *= (-5.0 * dt).exp();
         }
         // Al soltar el mouse la cámara regresa sola detrás de la nave.
         if !self.dragging && !self.overview {
