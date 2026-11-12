@@ -273,4 +273,18 @@ mod tests {
         // En el centro de la pantalla tiene que ganar la esfera de adelante (id 1).
         assert_eq!(fb.gbuf[32 * 64 + 32].id, 1);
     }
+
+    #[test]
+    fn el_recorte_cercano_no_deja_hoyos() {
+        // La cámara está dentro de una esfera grande: todos los píxeles deben quedar cubiertos.
+        let mut mesh = geometry::icosphere(3);
+        for t in mesh.indices.iter_mut() {
+            t.swap(1, 2); // caras hacia adentro
+        }
+        let mut fb = Framebuffer::new(48, 48);
+        let mut st = Stats::default();
+        let model = math::model_matrix(Vector3::new(0.0, 0.0, 4.0), 3.0, 0.0, 0.0);
+        draw(&mut fb, &camera(), &call(&mesh, model), &mut st);
+        assert!(fb.gbuf.iter().all(|s| s.id == 1));
+    }
 }
