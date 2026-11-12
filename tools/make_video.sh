@@ -13,16 +13,22 @@ fi
 if [ $# -ge 1 ]; then
   # Con música: se corta al largo del video y se baja el volumen al final.
   ffmpeg -y -framerate 30 -i docs/frames/%05d.png -i "$1" \
-    -c:v libx264 -preset veryfast -crf 27 -pix_fmt yuv420p \
+    -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p \
     -c:a aac -b:a 160k -af "afade=t=out:st=72:d=4" -shortest docs/recorrido.mp4
 else
   ffmpeg -y -framerate 30 -i docs/frames/%05d.png \
-    -c:v libx264 -preset veryfast -crf 27 -pix_fmt yuv420p docs/recorrido.mp4
+    -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p docs/recorrido.mp4
 fi
+
+# Versión liviana (720p, menos de 10 MB) para arrastrarla al editor del README en GitHub:
+# así GitHub la guarda como adjunto y la muestra con reproductor dentro del README.
+ffmpeg -y -i docs/recorrido.mp4 -vf scale=1280:-2 -c:v libx264 -preset veryfast -b:v 700k -pass 1 -an -f mp4 /dev/null
+ffmpeg -y -i docs/recorrido.mp4 -vf scale=1280:-2 -c:v libx264 -preset veryfast -b:v 700k -pass 2 -c:a aac -b:a 64k docs/recorrido_readme.mp4
+rm -f ffmpeg2pass-0.log ffmpeg2pass-0.log.mbtree
 
 # GIF corto (la llegada a Tessara y la serpiente) para el README y Discord.
 ffmpeg -y -ss 9 -t 12 -i docs/recorrido.mp4 \
   -vf "fps=12,scale=480:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=3" \
   docs/recorrido.gif
 
-echo "Listo: docs/recorrido.mp4 y docs/recorrido.gif"
+echo "Listo: docs/recorrido.mp4 (1080p), docs/recorrido_readme.mp4 (720p) y docs/recorrido.gif"
