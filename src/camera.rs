@@ -15,6 +15,7 @@ pub struct ChaseCamera {
     pub local: bool,    // la nave está en modo local: la cámara mira más hacia el suelo
     pub altitude: f32,  // altura sobre el planeta en modo local
     pub shake: f32,     // sacudida al chocar (se apaga sola)
+    pub overview_zoom: f32, // 1 = todo el sistema; menos = más cerca
     clock: f32,
 }
 
@@ -30,6 +31,7 @@ impl ChaseCamera {
             local: false,
             altitude: 0.0,
             shake: 0.0,
+            overview_zoom: 1.0,
             clock: 0.0,
         };
         c.snap(ship);
@@ -39,7 +41,7 @@ impl ChaseCamera {
     fn desired(&self, ship: &Ship) -> CameraView {
         if self.overview {
             // Vista desde arriba del plano eclíptico, girable con el mouse.
-            let eye = rotate_axis(Vector3::new(0.0, 300.0, 250.0), Vector3::new(0.0, 1.0, 0.0), self.look_yaw);
+            let eye = rotate_axis(Vector3::new(0.0, 300.0, 250.0) * self.overview_zoom, Vector3::new(0.0, 1.0, 0.0), self.look_yaw);
             return CameraView { eye, target: Vector3::zero(), up: Vector3::new(0.0, 1.0, 0.0), fov: FOV_Y };
         }
         let right = ship.right();
