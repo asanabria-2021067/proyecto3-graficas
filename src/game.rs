@@ -58,6 +58,8 @@ pub struct Game {
     pub decor: Vec<Vec<Instance>>,
     pub settings: Settings,
     pub collided: f32, // tiempo desde el último choque (para avisar en el HUD)
+    pub trail: Vec<Vector3>, // posiciones recientes de los motores (estela)
+    trail_timer: f32,
     accumulator: f32,
     noise: OpenSimplex,
 }
@@ -86,6 +88,8 @@ impl Game {
             decor: Vec::new(),
             settings: Settings::default(),
             collided: 10.0,
+            trail: Vec::new(),
+            trail_timer: 0.0,
             accumulator: 0.0,
             noise,
         };
@@ -119,6 +123,20 @@ impl Game {
             self.physics(&input.controls, STEP);
         }
         self.collided += dt;
+
+        // Estela: un punto cada 40 ms, solo cuando el motor empuja.
+        self.trail_timer += dt;
+        if self.trail_timer >= 0.04 {
+            self.trail_timer = 0.0;
+            if self.ship.throttle > 0.15 {
+                self.trail.push(self.ship.pos - self.ship.forward * 0.55);
+            } else if !self.trail.is_empty() {
+                self.trail.remove(0);
+            }
+            if self.trail.len() > 45 {
+                self.trail.remove(0);
+            }
+        }
 
         let (nearest, _) = self.system.nearest(self.ship.pos, self.orbit_time);
         let b = &self.system.bodies[nearest];
@@ -275,6 +293,7 @@ impl Game {
             ship_thrust: self.ship.throttle.max(0.0),
             ship_pos: self.ship.pos,
             ship_forward: self.ship.forward,
+            trail: &self.trail,
             camera: self.camera.view,
             settings: self.settings,
             highlight: self.autopilot.or(match self.mode {
