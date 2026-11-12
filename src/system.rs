@@ -141,4 +141,13 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn una_vuelta_completa_regresa_al_inicio() {
+        let s = System::new();
+        for b in s.bodies.iter().skip(1) {
+            let d = (b.center(0.0) - b.center(b.orbit_period)).length();
+            assert!(d < 1e-2, "{}", b.name);
+        }
+    }
 }
