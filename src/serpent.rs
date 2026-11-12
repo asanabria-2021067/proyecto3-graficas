@@ -84,7 +84,8 @@ impl Serpent {
     /// Curva en el espacio tangente del punto de salida: sube dando vueltas.
     /// `u` = largo recorrido desde el suelo. Devuelve (x, altura, z) en radios del planeta.
     fn curve(u: f32, time: f32) -> Vector3 {
-        let sway = (time * 0.7 + u * 3.0).sin() * 0.06;
+        // La ondulación crece con la altura: la base se queda fija en el suelo.
+        let sway = (time * 0.7 + u * 3.0).sin() * 0.06 * (u * 2.0).min(1.0);
         let coil = 0.16 + u * 0.1;
         let a = u * 4.2 + sway;
         Vector3::new(a.cos() * coil - coil, u * 0.42, a.sin() * coil)
@@ -165,7 +166,7 @@ mod tests {
         let noise = OpenSimplex::new(7);
         let s = Serpent::new(2, &noise);
         assert!(rocky::terrain(&noise, s.dir).land > 0.99);
-        let sys = System::new();
+        let sys = crate::system::System::new();
         let b = &sys.bodies[2];
         let parts = s.parts(b, &b.shade_object(0.0), CYCLE * 0.5);
         // Todos los segmentos + 2 ojos cuando ya salió completa.
