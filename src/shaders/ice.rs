@@ -45,7 +45,7 @@ pub fn ice(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
     let half = (l + v).normalized();
     let ndh = shading_n.dot(half).max(0.0);
     let spec = ndh.powf(120.0) * 1.4 * frozen_sea + ndh.powf(20.0) * 0.18 * (1.0 - frozen_sea);
-    color = color + rgb(0.9, 0.97, 1.0) * spec * terminator;
+    color += rgb(0.9, 0.97, 1.0) * spec * terminator;
 
     // ---------- 4. Aurora (animada) ----------
     // Cortinas verdes cerca de los polos que ondulan con ruido 4D. Solo se ven de noche.
@@ -56,7 +56,7 @@ pub fn ice(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
     let curtains = ((lon * 9.0 + wave * 6.0 + t * 0.6).sin() * 0.5 + 0.5).powf(3.0);
     let night = 1.0 - smoothstep(-0.2, 0.15, n.dot(l));
     let aurora = band * curtains * night * o.intensity * 1.6;
-    color = color + mix(rgb(0.1, 0.9, 0.5), rgb(0.5, 0.3, 1.0), smoothstep(0.7, 0.86, lat)) * aurora;
+    color += mix(rgb(0.1, 0.9, 0.5), rgb(0.5, 0.3, 1.0), smoothstep(0.7, 0.86, lat)) * aurora;
 
     // Atmósfera fría en el borde.
     let rim = (1.0 - n.dot(v).max(0.0)).powf(3.0);
