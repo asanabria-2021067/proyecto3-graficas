@@ -122,4 +122,15 @@ mod tests {
         }
         assert!(lo.alt >= min_altitude(6.0) - 1e-4);
     }
+
+    #[test]
+    fn el_rumbo_sigue_tangente() {
+        let mut lo = orbita();
+        let c = Controls { thrust: 1.0, yaw: 0.6, lift: 0.3, ..Default::default() };
+        for _ in 0..120 * 8 {
+            lo.step(&c, 6.0, 1.0 / 120.0);
+        }
+        assert!(lo.heading.dot(lo.dir).abs() < 1e-3);
+        assert!((lo.dir.length() - 1.0).abs() < 1e-4);
+    }
 }
