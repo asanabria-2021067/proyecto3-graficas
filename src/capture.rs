@@ -49,6 +49,9 @@ fn place(game: &mut Game, s: &Shot) {
     game.enter_local(s.body);
     game.camera.distance = s.distance;
     game.camera.local = true;
+    if let Mode::Local(lo) = game.mode {
+        game.camera.altitude = lo.alt;
+    }
     game.camera.snap(&game.ship);
 }
 
