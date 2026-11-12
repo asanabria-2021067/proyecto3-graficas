@@ -108,7 +108,7 @@ pub fn sun_glow(fb: &mut Framebuffer, vp: &Mat4, proj: &Mat4, sun: Vector3, radi
                 continue; // hay algo entre la cámara y el sol
             }
             let g = (-(d - 1.0) * 2.2).exp() * 0.55;
-            fb.color[i] = fb.color[i] + Vector3::new(1.0, 0.55, 0.18) * g;
+            fb.color[i] += Vector3::new(1.0, 0.55, 0.18) * g;
         }
     }
 }
