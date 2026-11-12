@@ -164,4 +164,14 @@ mod tests {
         assert!(s.forward.dot(s.up).abs() < 1e-3);
         assert!((s.up.length() - 1.0).abs() < 1e-3);
     }
+
+    #[test]
+    fn la_gravedad_dobla_la_trayectoria() {
+        let mut s = nave();
+        s.vel = Vector3::new(0.0, 0.0, 10.0);
+        for _ in 0..120 {
+            s.step(&Controls::default(), Vector3::new(3.0, 0.0, 0.0), 1.0 / 120.0);
+        }
+        assert!(s.vel.x > 2.5);
+    }
 }
