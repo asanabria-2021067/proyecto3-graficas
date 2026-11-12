@@ -63,7 +63,7 @@ pub fn toon(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
 
     // Brillo de caricatura: una mancha blanca recortada.
     let half = (l + v).normalized();
-    color = color + rgb(1.0, 1.0, 1.0) * smoothstep(0.993, 0.995, n.dot(half)) * 0.18 * (1.0 - path);
+    color += rgb(1.0, 1.0, 1.0) * smoothstep(0.993, 0.995, n.dot(half)) * 0.18 * (1.0 - path);
 
     // Contorno oscuro en la silueta + luz de borde cálida.
     let facing = n.dot(v);
