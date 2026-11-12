@@ -33,7 +33,7 @@ const FIRST_DECOR_ID: usize = 32;
 /// Mallas que se generan una sola vez al iniciar.
 pub struct Meshes {
     pub sphere: Vec<Mesh>,   // icosfera, niveles 0..=MAX_LOD
-    pub deformed: Vec<Mesh>, // la misma icosfera deformada (Kharon)
+    pub deformed: Vec<Vec<Mesh>>, // icosferas deformadas: [semilla del terreno][nivel]
     pub ring: Mesh,
     pub ship: Mesh,
     pub models: Models,
@@ -43,7 +43,8 @@ pub struct Meshes {
 impl Meshes {
     pub fn build(noise: &OpenSimplex) -> Result<Self, String> {
         let sphere = geometry::icosphere_lods(MAX_LOD as u32);
-        let deformed = sphere.iter().map(|m| geometry::deform(m, |d| barren::height(noise, d, 0))).collect();
+        // Semilla 0 = Kharon, 1 = Nix (la luna).
+        let deformed = (0..2).map(|seed| sphere.iter().map(|m| geometry::deform(m, |d| barren::height(noise, d, seed))).collect()).collect();
         Ok(Self {
             sphere,
             deformed,
@@ -176,7 +177,7 @@ impl Renderer {
                 report.stats.objects_culled += 1;
                 continue;
             }
-            let mesh = if body.deformed { &meshes.deformed[level] } else { &meshes.sphere[level] };
+            let mesh = if body.deformed { &meshes.deformed[body.terrain_seed as usize][level] } else { &meshes.sphere[level] };
             let model = math::model_matrix(so.center, r, so.tilt, so.spin);
             pipeline::draw(
                 fb,
@@ -289,7 +290,7 @@ impl Renderer {
         self.background.draw_stars(fb, &vp);
         overlay::trail(fb, &vp, f.trail);
         if f.settings.orbits {
-            overlay::orbits(fb, &vp, f.system, f.highlight);
+            overlay::orbits(fb, &vp, f.system, t, f.highlight);
         }
         let ray = |x: usize, y: usize| {
             let ndc_x = (x as f32 + 0.5) / w as f32 * 2.0 - 1.0;
