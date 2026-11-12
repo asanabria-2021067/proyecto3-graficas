@@ -83,8 +83,20 @@ pub fn trail(fb: &mut Framebuffer, vp: &Mat4, points: &[Vector3]) {
 /// Halo de atmósfera alrededor de un planeta: luz fuera de la silueta, más fuerte del lado
 /// que mira al sol. Para cada píxel del fondo se calcula a qué distancia pasa su rayo de
 /// vista del centro del planeta: si pasa un poco por fuera del radio, ahí hay atmósfera.
-/// `ray(x, y)` da la dirección de vista de un píxel.
-pub fn atmosphere(fb: &mut Framebuffer, ray: &dyn Fn(usize, usize) -> Vector3, center: Vector3, radius: f32, eye: Vector3, sun: Vector3, color: Vector3) {
+/// `ray(x, y)` da la dirección de vista de un píxel. Solo se revisan los píxeles dentro del
+/// rectángulo donde puede caer el halo (`screen_box`).
+#[allow(clippy::too_many_arguments)]
+pub fn atmosphere(
+    fb: &mut Framebuffer,
+    ray: &dyn Fn(usize, usize) -> Vector3,
+    vp: &Mat4,
+    proj: &Mat4,
+    center: Vector3,
+    radius: f32,
+    eye: Vector3,
+    sun: Vector3,
+    color: Vector3,
+) {
     let to_c = center - eye;
     let dist = to_c.length();
     let thick = radius * 0.08;
@@ -94,8 +106,9 @@ pub fn atmosphere(fb: &mut Framebuffer, ray: &dyn Fn(usize, usize) -> Vector3, c
     }
     let to_sun = (sun - center).normalized();
     let (w, h) = (fb.width, fb.height);
-    for y in 0..h {
-        for x in 0..w {
+    let (x0, x1, y0, y1) = screen_box(vp, proj, center, radius * 1.1, dist, w, h);
+    for y in y0..y1 {
+        for x in x0..x1 {
             let i = y * w + x;
             if fb.gbuf[i].id != 0 {
                 continue;
@@ -115,6 +128,21 @@ pub fn atmosphere(fb: &mut Framebuffer, ray: &dyn Fn(usize, usize) -> Vector3, c
             fb.color[i] += color * a;
         }
     }
+}
+
+/// Rectángulo de pantalla que cubre una esfera (con margen). Si la esfera queda muy cerca
+/// o detrás de la cámara se usa toda la pantalla.
+fn screen_box(vp: &Mat4, proj: &Mat4, center: Vector3, radius: f32, dist: f32, w: usize, h: usize) -> (usize, usize, usize, usize) {
+    let c = math::transform(vp, center, 1.0);
+    if c[3] < radius * 1.5 {
+        return (0, w, 0, h);
+    }
+    let ang = (radius / dist).min(0.95).asin();
+    // El margen de 1.5 cubre que una esfera lejos del centro de la vista se ve más ancha.
+    let r = ang.tan() * proj[1][1] * h as f32 * 0.5 * 1.5;
+    let (cx, cy) = ((c[0] / c[3] + 1.0) * 0.5 * w as f32, (1.0 - c[1] / c[3]) * 0.5 * h as f32);
+    let clamp = |v: f32, max: usize| v.clamp(0.0, max as f32) as usize;
+    (clamp(cx - r, w), clamp(cx + r + 1.0, w), clamp(cy - r, h), clamp(cy + r + 1.0, h))
 }
 
 /// Halo alrededor del sol: se suma luz que cae con la distancia al disco.
