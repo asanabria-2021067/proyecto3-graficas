@@ -91,7 +91,7 @@ impl Background {
             }
             let i = y as usize * fb.width + x as usize;
             if fb.gbuf[i].id == 0 {
-                fb.color[i] = fb.color[i] + s.color;
+                fb.color[i] += s.color;
                 if s.big {
                     // Las estrellas brillantes ocupan una crucecita, pero sin tapar objetos.
                     for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
