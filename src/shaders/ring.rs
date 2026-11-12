@@ -1,7 +1,7 @@
 //! Anillo de Orvane. La malla es un disco plano; los huecos entre anillos se recortan en
 //! el rasterizado (prueba de transparencia) y el color sale de bandas según el radio.
 //! También recibe la sombra del planeta.
-use super::{mix, rgb, smoothstep, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, rgb, smoothstep};
 use crate::framebuffer::GSample;
 use raylib::prelude::*;
 

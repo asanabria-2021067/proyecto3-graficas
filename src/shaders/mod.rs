@@ -29,7 +29,7 @@ pub enum Material {
     Ring,
     Toon,    // Mirra, el planeta miniatura
     Serpent, // la serpiente de roca de Tessara
-    Flat, // modelos de la superficie (árboles, rocas, casas...)
+    Flat,    // modelos de la superficie (árboles, rocas, casas...)
     Ship,
 }
 
@@ -47,15 +47,7 @@ pub struct ShadeObject {
 
 impl ShadeObject {
     pub fn new(material: Material) -> Self {
-        Self {
-            material,
-            center: Vector3::zero(),
-            radius: 1.0,
-            spin: 0.0,
-            tilt: 0.0,
-            deformed: false,
-            intensity: 0.5,
-        }
+        Self { material, center: Vector3::zero(), radius: 1.0, spin: 0.0, tilt: 0.0, deformed: false, intensity: 0.5 }
     }
 
     /// mundo -> objeto: deshace la inclinación y luego el giro.

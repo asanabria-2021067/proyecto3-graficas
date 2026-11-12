@@ -1,7 +1,7 @@
 //! Orvane: gigante gaseoso (viene del lab 6). Bandas que fluyen como líquido y una
 //! tormenta que tuerce las bandas a su alrededor. `intensity` = fuerza de la tormenta.
 use super::noise_helpers::{fbm, fbm4};
-use super::{mix, ramp, rgb, smoothstep, surface, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, ramp, rgb, smoothstep, surface};
 use crate::framebuffer::GSample;
 use crate::math::{rotate_axis, rotate_y};
 use noise::OpenSimplex;
@@ -57,8 +57,8 @@ pub fn gas_giant(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
     // ---------- 3. Ojo y collar de la tormenta ----------
     let k = (storm_strength / 5.0).min(1.0);
     let core = smoothstep(STORM_RADIUS * 0.6, STORM_RADIUS * 0.2, d);
-    let collar = smoothstep(STORM_RADIUS * 0.75, STORM_RADIUS * 0.58, d)
-        * (1.0 - smoothstep(STORM_RADIUS * 0.58, STORM_RADIUS * 0.45, d));
+    let collar =
+        smoothstep(STORM_RADIUS * 0.75, STORM_RADIUS * 0.58, d) * (1.0 - smoothstep(STORM_RADIUS * 0.58, STORM_RADIUS * 0.45, d));
     let storm_col = mix(rgb(0.55, 0.12, 0.06), rgb(0.95, 0.45, 0.18), r * 0.5 + 0.5);
     color = mix(color, rgb(0.97, 0.90, 0.78), collar * 0.55 * k);
     color = mix(color, storm_col, core * k);

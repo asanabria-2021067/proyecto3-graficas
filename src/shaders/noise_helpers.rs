@@ -52,9 +52,8 @@ pub fn ridged(noise: &OpenSimplex, p: Vector3, octaves: u32) -> f32 {
 /// Hash de 3 enteros a un número en [0, 1). Sirve para poner un punto en cada celda.
 #[inline]
 pub fn hash3(x: i32, y: i32, z: i32) -> f32 {
-    let mut h = (x as u32).wrapping_mul(0x8da6_b343)
-        ^ (y as u32).wrapping_mul(0xd816_3841)
-        ^ (z as u32).wrapping_mul(0xcb1a_b31f);
+    let mut h =
+        (x as u32).wrapping_mul(0x8da6_b343) ^ (y as u32).wrapping_mul(0xd816_3841) ^ (z as u32).wrapping_mul(0xcb1a_b31f);
     h = (h ^ (h >> 13)).wrapping_mul(0x5bd1_e995);
     ((h ^ (h >> 15)) & 0x00ff_ffff) as f32 / 16_777_216.0
 }

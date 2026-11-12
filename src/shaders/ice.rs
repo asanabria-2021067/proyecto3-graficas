@@ -2,7 +2,7 @@
 //! congelados que brillan, relieve con el mapa de normales "agrietado" y auroras
 //! animadas en los polos del lado de noche. `intensity` = fuerza de la aurora.
 use super::noise_helpers::{cellular, fbm, fbm4};
-use super::{mix, rgb, smoothstep, surface, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, rgb, smoothstep, surface};
 use crate::framebuffer::GSample;
 use raylib::prelude::*;
 
@@ -27,11 +27,7 @@ pub fn ice(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
     albedo = mix(albedo, rgb(0.10, 0.30, 0.55), crevasse * (1.0 - frozen_sea) * 0.8);
 
     // ---------- 2. Relieve: mapa de normales de grietas ----------
-    let shading_n = if g.normal_mapping {
-        g.maps.cracks.triplanar(p, n, 3.5, 0.45 * (1.0 - frozen_sea * 0.8))
-    } else {
-        n
-    };
+    let shading_n = if g.normal_mapping { g.maps.cracks.triplanar(p, n, 3.5, 0.45 * (1.0 - frozen_sea * 0.8)) } else { n };
 
     // ---------- 3. Luz ----------
     let ndl = shading_n.dot(l);

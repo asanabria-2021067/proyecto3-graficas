@@ -3,7 +3,7 @@
 //! El shader colorea según la altura real de cada punto y la pendiente de la malla.
 //! `intensity` = fuerza del mapa de normales.
 use super::noise_helpers::{fbm, hash3, ridged};
-use super::{mix, ramp, rgb, smoothstep, surface, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, ramp, rgb, smoothstep, surface};
 use crate::framebuffer::GSample;
 use noise::OpenSimplex;
 use raylib::prelude::*;

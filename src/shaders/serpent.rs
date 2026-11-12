@@ -3,7 +3,7 @@
 //! `intensity` = posición del segmento en el cuerpo (0 = cabeza, 1 = cola); los ojos usan -1.
 //! `center` = centro del planeta, para saber si en ese punto es de día.
 use super::noise_helpers::{cellular, fbm};
-use super::{mix, ramp, rgb, smoothstep, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, ramp, rgb, smoothstep};
 use crate::framebuffer::GSample;
 use raylib::prelude::*;
 

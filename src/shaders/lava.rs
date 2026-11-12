@@ -3,18 +3,13 @@
 //! el ruido se deforma con otro ruido que cambia con el tiempo (shader animado).
 //! `intensity` = qué tan caliente está (grietas más anchas y lava más brillante).
 use super::noise_helpers::{cellular, fbm, fbm4, sample4};
-use super::{mix, ramp, rgb, smoothstep, surface, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, ramp, rgb, smoothstep, surface};
 use crate::framebuffer::GSample;
 use raylib::prelude::*;
 
 fn lava_color(heat: f32) -> Vector3 {
     ramp(
-        &[
-            (0.0, rgb(0.25, 0.02, 0.0)),
-            (0.35, rgb(0.85, 0.12, 0.01)),
-            (0.65, rgb(1.0, 0.45, 0.03)),
-            (0.9, rgb(1.0, 0.85, 0.35)),
-        ],
+        &[(0.0, rgb(0.25, 0.02, 0.0)), (0.35, rgb(0.85, 0.12, 0.01)), (0.65, rgb(1.0, 0.45, 0.03)), (0.9, rgb(1.0, 0.85, 0.35))],
         heat,
     )
 }

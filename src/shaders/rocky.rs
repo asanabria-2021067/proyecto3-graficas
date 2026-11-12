@@ -2,7 +2,7 @@
 //! nubes que se mueven, sombras de nubes, reflejo del sol en el agua y ciudades de noche.
 //! El relieve ahora sale del mapa de normales en vez de derivar el ruido en cada píxel.
 use super::noise_helpers::{fbm, ridged, sample};
-use super::{mix, rgb, smoothstep, surface, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, rgb, smoothstep, surface};
 use crate::framebuffer::GSample;
 use crate::math::rotate_y;
 use noise::OpenSimplex;

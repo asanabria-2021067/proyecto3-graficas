@@ -3,7 +3,7 @@
 //! camino de baldosas que da vueltas en espiral de un polo al otro.
 //! `intensity` = cantidad de florecitas en el pasto.
 use super::noise_helpers::{cellular, fbm, hash3};
-use super::{mix, rgb, smoothstep, surface, Globals, ShadeObject};
+use super::{Globals, ShadeObject, mix, rgb, smoothstep, surface};
 use crate::framebuffer::GSample;
 use raylib::prelude::*;
 use std::f32::consts::{PI, TAU};

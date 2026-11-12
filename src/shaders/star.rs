@@ -2,7 +2,7 @@
 //! granulación, manchas solares y oscurecimiento del borde.
 //! No depende de la luz: la estrella ES la fuente de luz.
 use super::noise_helpers::{fbm4, sample4};
-use super::{ramp, rgb, smoothstep, surface, Globals, ShadeObject};
+use super::{Globals, ShadeObject, ramp, rgb, smoothstep, surface};
 use crate::framebuffer::GSample;
 use raylib::prelude::*;
 

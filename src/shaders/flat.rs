@@ -1,6 +1,6 @@
 //! Shaders de los modelos .obj: los objetos de la superficie y la nave.
 //! Usan el color del material (Kd) y la luz del sol como luz puntual.
-use super::{rgb, smoothstep, Globals, ShadeObject};
+use super::{Globals, ShadeObject, rgb, smoothstep};
 use crate::framebuffer::GSample;
 use raylib::prelude::*;
 
