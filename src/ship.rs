@@ -174,4 +174,11 @@ mod tests {
         }
         assert!(s.vel.x > 2.5);
     }
+
+    #[test]
+    fn no_pasa_la_velocidad_maxima() {
+        let mut s = nave();
+        volar(&mut s, Controls { thrust: 1.0, ..Default::default() }, 30.0, 1.0 / 120.0);
+        assert!(s.speed() <= MAX_SPEED + 1e-3);
+    }
 }
