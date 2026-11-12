@@ -50,4 +50,11 @@ mod tests {
             assert_eq!(a.next_u32(), b.next_u32());
         }
     }
+
+    #[test]
+    fn semillas_distintas_dan_numeros_distintos() {
+        let (mut a, mut b) = (Rng::new(1), Rng::new(2));
+        let same = (0..50).filter(|_| a.next_u32() == b.next_u32()).count();
+        assert!(same < 2);
+    }
 }
