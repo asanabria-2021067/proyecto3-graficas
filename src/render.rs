@@ -295,3 +295,19 @@ impl Renderer {
         report
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mas_cerca_mas_detalle() {
+        let mut prev = 0;
+        for px in [1.0, 10.0, 40.0, 100.0, 300.0] {
+            let l = lod_for(px);
+            assert!(l >= prev && l <= MAX_LOD);
+            prev = l;
+        }
+        assert_eq!(lod_for(1000.0), MAX_LOD);
+    }
+}
