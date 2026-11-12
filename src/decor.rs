@@ -169,3 +169,22 @@ pub fn model_matrix(inst: &Instance, body: &Body, planet: &ShadeObject, noise: &
     let pos = planet.center + up * (surface - s * 0.06);
     (math::from_basis(pos, right, up, forward, s), pos + up * (s * 0.5), mesh_radius * s)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::system::System;
+
+    #[test]
+    fn misma_semilla_mismas_posiciones() {
+        let noise = OpenSimplex::new(7);
+        let s = System::new();
+        let a = scatter(&s.bodies[2], &noise, 5);
+        let b = scatter(&s.bodies[2], &noise, 5);
+        assert_eq!(a.len(), b.len());
+        for (x, y) in a.iter().zip(&b) {
+            assert_eq!(x.kind, y.kind);
+            assert!((x.dir - y.dir).length() < 1e-6);
+        }
+    }
+}
