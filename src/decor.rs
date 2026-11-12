@@ -187,4 +187,13 @@ mod tests {
             assert!((x.dir - y.dir).length() < 1e-6);
         }
     }
+
+    #[test]
+    fn otra_semilla_cambia_las_posiciones() {
+        let noise = OpenSimplex::new(7);
+        let s = System::new();
+        let a = scatter(&s.bodies[2], &noise, 5);
+        let b = scatter(&s.bodies[2], &noise, 6);
+        assert!((a[0].dir - b[0].dir).length() > 1e-3);
+    }
 }
