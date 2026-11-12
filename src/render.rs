@@ -307,7 +307,7 @@ impl Renderer {
             };
             if let Some(color) = color {
                 let sun = f.system.bodies[0].center(t);
-                overlay::atmosphere(fb, &ray, b.center(t), b.radius(), f.camera.eye, sun, color);
+                overlay::atmosphere(fb, &ray, &vp, &proj, b.center(t), b.radius(), f.camera.eye, sun, color);
             }
         }
         overlay::sun_glow(fb, &vp, &proj, f.system.bodies[0].center(t), f.system.bodies[0].radius(), f.camera.eye);
