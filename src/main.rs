@@ -232,8 +232,8 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
             s.triangles_drawn, s.triangles_frustum, s.triangles_back, s.triangles_in
         ),
         format!(
-            "Objetos: {} dibujados, {} descartados   Superficie: {} dibujados, {} descartados",
-            s.objects, s.objects_culled, report.decor_drawn, report.decor_culled
+            "Objetos: {} dibujados, {} descartados   Superficie: {} dibujados, {} fuera de vista, {} muy lejos",
+            s.objects, s.objects_culled, report.decor_drawn, report.decor_culled, report.decor_tiny
         ),
         format!("LOD: {}", lod_txt.join("  ")),
         format!(
