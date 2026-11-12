@@ -196,4 +196,15 @@ mod tests {
         let b = scatter(&s.bodies[2], &noise, 6);
         assert!((a[0].dir - b[0].dir).length() > 1e-3);
     }
+
+    #[test]
+    fn en_tessara_nada_cae_en_el_mar() {
+        let noise = OpenSimplex::new(7);
+        let s = System::new();
+        let objs = scatter(&s.bodies[2], &noise, 7);
+        assert!(objs.len() > 50);
+        for o in &objs {
+            assert!(rocky::terrain(&noise, o.dir).land > 0.9);
+        }
+    }
 }
