@@ -2,11 +2,7 @@
 /screenshots
 /docs/frames
 
-# Archivos de herramientas locales
-.claude/
-CLAUDE.md
-*.skill
-skills/
+# Archivos de editores
 .vscode/
 .idea/
 *.swp
