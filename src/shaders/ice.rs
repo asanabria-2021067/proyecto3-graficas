@@ -28,7 +28,7 @@ pub fn ice(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
 
     // ---------- 2. Relieve: mapa de normales de grietas ----------
     let shading_n = if g.normal_mapping {
-        g.maps.cracks.triplanar(p, n, 2.5, 0.75 * (1.0 - frozen_sea * 0.8))
+        g.maps.cracks.triplanar(p, n, 3.5, 0.45 * (1.0 - frozen_sea * 0.8))
     } else {
         n
     };
