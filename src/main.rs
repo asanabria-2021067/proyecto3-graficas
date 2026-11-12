@@ -99,10 +99,7 @@ fn main() {
         return;
     }
 
-    let (mut rl, thread) = raylib::init()
-        .size(WIDTH, HEIGHT)
-        .title("Proyecto 3 - Space Travel")
-        .build();
+    let (mut rl, thread) = raylib::init().size(WIDTH, HEIGHT).title("Proyecto 3 - Space Travel").build();
     rl.set_target_fps(60);
     rl.set_exit_key(None);
     let make_texture = |rl: &mut RaylibHandle, fb: &Framebuffer| {
@@ -207,7 +204,8 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
     let s = &report.stats;
     let on = |b: bool| if b { "si" } else { "no" };
     let st = &game.settings;
-    let lod_txt: Vec<String> = game.system.bodies.iter().zip(&report.lods).map(|(b, l)| format!("{}:{}", &b.name[..3], l)).collect();
+    let lod_txt: Vec<String> =
+        game.system.bodies.iter().zip(&report.lods).map(|(b, l)| format!("{}:{}", &b.name[..3], l)).collect();
     let bottom = [
         format!(
             "Triangulos: {} dibujados, {} fuera de vista, {} de espaldas  (de {})",
@@ -220,7 +218,11 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
         format!("LOD: {}", lod_txt.join("  ")),
         format!(
             "[C] descarte: {}  [L] LOD: {}  [N] normales: {}  [G] gravedad: {}  [P] pausa: {}",
-            on(st.culling), on(st.lod), on(st.normal_mapping), on(game.gravity_on), on(game.paused)
+            on(st.culling),
+            on(st.lod),
+            on(st.normal_mapping),
+            on(game.gravity_on),
+            on(game.paused)
         ),
         format!(
             "{}: [9/0] radio x{:.2}  [,/.] intensidad {:.2}   [-/=] velocidad orbital x{:.2}   [ [/] ] semilla {}",

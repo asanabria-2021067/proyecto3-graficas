@@ -42,11 +42,8 @@ pub fn orbits(fb: &mut Framebuffer, vp: &Mat4, system: &System, highlight: Optio
             let a = k as f32 / segments as f32 * TAU;
             let p = Vector3::new(a.cos(), 0.0, a.sin()) * body.orbit_radius;
             let c = math::transform(vp, p, 1.0);
-            let cur = if c[3] > 0.5 {
-                Some(((c[0] / c[3] + 1.0) * 0.5 * w, (1.0 - c[1] / c[3]) * 0.5 * h, 1.0 / c[3]))
-            } else {
-                None
-            };
+            let cur =
+                if c[3] > 0.5 { Some(((c[0] / c[3] + 1.0) * 0.5 * w, (1.0 - c[1] / c[3]) * 0.5 * h, 1.0 / c[3])) } else { None };
             if let (Some(a), Some(b)) = (prev, cur) {
                 line(fb, a, b, body.color, alpha, &mut dash);
             }

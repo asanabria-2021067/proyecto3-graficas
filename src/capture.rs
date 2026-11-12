@@ -10,9 +10,9 @@ use raylib::prelude::*;
 struct Shot {
     name: &'static str,
     body: usize,
-    lat: f32,  // grados, posición sobre el planeta (en el mundo, no gira con él)
+    lat: f32, // grados, posición sobre el planeta (en el mundo, no gira con él)
     lon: f32,
-    alt: f32,  // en radios del planeta
+    alt: f32, // en radios del planeta
     heading: f32,
     time: f32,
     distance: f32, // distancia de la cámara a la nave
@@ -133,7 +133,8 @@ pub fn benchmark() {
          Generado con `cargo run --release -- capture rendimiento` (640x360, promedio de 5 cuadros).\n\
          \"Triángulos enviados\" son los que llegan al pipeline; los objetos descartados no mandan ninguno.\n\n",
     );
-    let scenes: [(&str, Option<usize>); 3] = [("Sobre Tessara (superficie)", Some(5)), ("Cerca de Kharon", Some(2)), ("Inicio, en el espacio", None)];
+    let scenes: [(&str, Option<usize>); 3] =
+        [("Sobre Tessara (superficie)", Some(5)), ("Cerca de Kharon", Some(2)), ("Inicio, en el espacio", None)];
     for (title, shot) in scenes {
         out.push_str(&format!("## {title}\n\n| Descarte | LOD | Objetos dibujados | Objetos descartados | Triángulos enviados | Triángulos rasterizados | ms por cuadro |\n|---|---|---|---|---|---|---|\n"));
         for (culling, lod) in [(true, true), (false, true), (true, false), (false, false)] {
@@ -156,7 +157,13 @@ pub fn benchmark() {
             let yn = |b: bool| if b { "sí" } else { "no" };
             out.push_str(&format!(
                 "| {} | {} | {} | {} | {} | {} | {:.1} |\n",
-                yn(culling), yn(lod), s.objects, s.objects_culled, s.triangles_in, s.triangles_drawn, ms
+                yn(culling),
+                yn(lod),
+                s.objects,
+                s.objects_culled,
+                s.triangles_in,
+                s.triangles_drawn,
+                ms
             ));
         }
         out.push('\n');

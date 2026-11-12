@@ -8,15 +8,15 @@ use crate::decor::tangent_frame;
 use crate::geometry;
 use crate::math::{self, Mat4};
 use crate::mesh::Mesh;
-use crate::shaders::rocky;
 use crate::shaders::ShadeObject;
+use crate::shaders::rocky;
 use crate::system::Body;
 use noise::OpenSimplex;
 use raylib::prelude::*;
 
 pub const SEGMENTS: usize = 40;
 const SPACING: f32 = 0.034; // separación entre segmentos sobre la curva (en radios del planeta)
-const CYCLE: f32 = 48.0;    // segundos: sale, se queda y se hunde
+const CYCLE: f32 = 48.0; // segundos: sale, se queda y se hunde
 
 pub struct Serpent {
     pub body: usize,
@@ -54,7 +54,9 @@ impl Serpent {
         // Segmento: icosfera chiquita deformada con ruido para que parezca roca.
         let rock = |seed: f32, stretch: Vector3| {
             let base = geometry::icosphere(2);
-            let mut m = geometry::deform(&base, |d| 1.0 + crate::shaders::noise_helpers::fbm(noise, d * 2.2 + Vector3::new(seed, 0.0, 0.0), 3) * 0.35);
+            let mut m = geometry::deform(&base, |d| {
+                1.0 + crate::shaders::noise_helpers::fbm(noise, d * 2.2 + Vector3::new(seed, 0.0, 0.0), 3) * 0.35
+            });
             for v in m.vertices.iter_mut() {
                 v.position = Vector3::new(v.position.x * stretch.x, v.position.y * stretch.y, v.position.z * stretch.z);
             }
@@ -118,13 +120,25 @@ impl Serpent {
             let is_head = k == 0;
             let mesh = if is_head { &self.head } else { &self.segment };
             let size = if is_head { size * 1.25 } else { size };
-            out.push(Part { mesh, model: math::from_basis(p, right, up, forward, size), center: p, radius: mesh.radius * size, param });
+            out.push(Part {
+                mesh,
+                model: math::from_basis(p, right, up, forward, size),
+                center: p,
+                radius: mesh.radius * size,
+                param,
+            });
             if is_head {
                 // Dos ojos a los lados de la cabeza.
                 for s in [-1.0, 1.0] {
                     let e = p + right * (size * 0.55 * s) + up * (size * 0.35) + forward * (size * 0.9);
                     let es = size * 0.16;
-                    out.push(Part { mesh: &self.eye, model: math::from_basis(e, right, up, forward, es), center: e, radius: es, param: -1.0 });
+                    out.push(Part {
+                        mesh: &self.eye,
+                        model: math::from_basis(e, right, up, forward, es),
+                        center: e,
+                        radius: es,
+                        param: -1.0,
+                    });
                 }
             }
         }

@@ -21,11 +21,7 @@ pub fn steer(ship: &Ship, target: Vector3, target_vel: Vector3, radius: f32) -> 
     let aim = (to_target + lead).normalized();
 
     let (lx, ly, lz) = (aim.dot(ship.right()), aim.dot(ship.up), aim.dot(ship.forward));
-    let mut c = Controls {
-        yaw: (lx * 3.0).clamp(-1.0, 1.0),
-        pitch: (ly * 3.0).clamp(-1.0, 1.0),
-        ..Default::default()
-    };
+    let mut c = Controls { yaw: (lx * 3.0).clamp(-1.0, 1.0), pitch: (ly * 3.0).clamp(-1.0, 1.0), ..Default::default() };
     if lz < 0.0 {
         c.yaw = if lx >= 0.0 { 1.0 } else { -1.0 };
     }

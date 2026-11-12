@@ -1,6 +1,6 @@
 //! El sistema solar: el sol y seis planetas, todos en el plano eclíptico (y = 0).
 //! Las órbitas son circulares y las posiciones dependen del tiempo, no de los cuadros.
-use crate::shaders::{barren, Material, ShadeObject};
+use crate::shaders::{Material, ShadeObject, barren};
 use noise::OpenSimplex;
 use raylib::prelude::*;
 use std::f32::consts::TAU;
@@ -13,13 +13,13 @@ pub struct Body {
     pub orbit_radius: f32,
     pub orbit_period: f32, // segundos por vuelta al sol
     pub orbit_phase: f32,
-    pub spin_period: f32,  // segundos por vuelta sobre su eje
+    pub spin_period: f32, // segundos por vuelta sobre su eje
     pub tilt: f32,
-    pub gravity: f32,      // aceleración en la superficie
-    pub intensity: f32,    // parámetro principal del shader
+    pub gravity: f32,   // aceleración en la superficie
+    pub intensity: f32, // parámetro principal del shader
     pub deformed: bool,
     pub ring: bool,
-    pub color: Vector3,    // para el minimapa y la línea de la órbita
+    pub color: Vector3, // para el minimapa y la línea de la órbita
 }
 
 impl Body {
@@ -112,7 +112,7 @@ impl System {
         ];
         bodies[0].intensity = 0.5;
         bodies[2].intensity = 0.48; // cobertura de nubes
-        bodies[6].intensity = 0.6;  // florecitas de Mirra
+        bodies[6].intensity = 0.6; // florecitas de Mirra
         bodies[3].deformed = true;
         bodies[5].ring = true;
         Self { bodies }

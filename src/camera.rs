@@ -8,12 +8,12 @@ use raylib::prelude::*;
 pub struct ChaseCamera {
     pub view: CameraView,
     pub distance: f32,
-    pub look_yaw: f32,   // giro extra con el mouse alrededor de la nave
+    pub look_yaw: f32, // giro extra con el mouse alrededor de la nave
     pub look_pitch: f32,
     pub overview: bool,
-    pub dragging: bool,  // el mouse está girando la cámara
-    pub local: bool,     // la nave está en modo local: la cámara mira más hacia el suelo
-    pub altitude: f32,   // altura sobre el planeta en modo local
+    pub dragging: bool, // el mouse está girando la cámara
+    pub local: bool,    // la nave está en modo local: la cámara mira más hacia el suelo
+    pub altitude: f32,  // altura sobre el planeta en modo local
 }
 
 impl ChaseCamera {

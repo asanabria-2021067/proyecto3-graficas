@@ -9,7 +9,7 @@ use crate::mesh::Mesh;
 use crate::obj;
 use crate::rng::Rng;
 use crate::shaders::noise_helpers::{fbm, ridged};
-use crate::shaders::{rocky, toon, Material, ShadeObject};
+use crate::shaders::{Material, ShadeObject, rocky, toon};
 use crate::system::Body;
 use noise::OpenSimplex;
 use raylib::prelude::*;
@@ -25,7 +25,8 @@ pub enum Kind {
     Lighthouse,
 }
 
-pub const KINDS: [Kind; 7] = [Kind::Tree, Kind::Rock, Kind::House, Kind::Crystal, Kind::Obelisk, Kind::Mushroom, Kind::Lighthouse];
+pub const KINDS: [Kind; 7] =
+    [Kind::Tree, Kind::Rock, Kind::House, Kind::Crystal, Kind::Obelisk, Kind::Mushroom, Kind::Lighthouse];
 
 impl Kind {
     fn file(self) -> &'static str {
@@ -156,7 +157,13 @@ pub fn tangent_frame(up: Vector3) -> (Vector3, Vector3) {
 /// Como la dirección está en el espacio del planeta, se pasa al mundo con el giro de este
 /// cuadro: el objeto sigue pegado al mismo punto mientras el planeta rota.
 /// Devuelve también el centro y el radio de su esfera envolvente (para el descarte).
-pub fn model_matrix(inst: &Instance, body: &Body, planet: &ShadeObject, noise: &OpenSimplex, mesh_radius: f32) -> (Mat4, Vector3, f32) {
+pub fn model_matrix(
+    inst: &Instance,
+    body: &Body,
+    planet: &ShadeObject,
+    noise: &OpenSimplex,
+    mesh_radius: f32,
+) -> (Mat4, Vector3, f32) {
     let r = body.radius();
     let s = inst.scale * r;
     let surface = r * body.height(noise, inst.dir);

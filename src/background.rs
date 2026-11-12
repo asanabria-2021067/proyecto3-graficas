@@ -96,7 +96,12 @@ impl Background {
                     // Las estrellas brillantes ocupan una crucecita, pero sin tapar objetos.
                     for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
                         let (nx, ny) = (x + dx, y + dy);
-                        if nx >= 0 && ny >= 0 && nx < fb.width as i32 && ny < fb.height as i32 && fb.gbuf[ny as usize * fb.width + nx as usize].id == 0 {
+                        if nx >= 0
+                            && ny >= 0
+                            && nx < fb.width as i32
+                            && ny < fb.height as i32
+                            && fb.gbuf[ny as usize * fb.width + nx as usize].id == 0
+                        {
                             fb.blend(nx, ny, s.color * 0.6, 0.5);
                         }
                     }

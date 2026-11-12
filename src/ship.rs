@@ -4,21 +4,21 @@
 //! empuje y la velocidad de giro, que se acercan a su valor objetivo con un suavizado
 //! exponencial. La física corre con paso fijo (ver `game.rs`), así la nave responde igual
 //! en una computadora lenta que en una rápida.
-use crate::math::{self, damp, rotate_axis, Mat4};
+use crate::math::{self, Mat4, damp, rotate_axis};
 use raylib::prelude::*;
 
-pub const SCALE: f32 = 0.16;   // la nave.obj mide ~8 unidades: queda de ~1.3
-pub const RADIUS: f32 = 0.7;   // radio para las colisiones
-const THRUST: f32 = 20.0;      // aceleración con el acelerador a fondo
+pub const SCALE: f32 = 0.16; // la nave.obj mide ~8 unidades: queda de ~1.3
+pub const RADIUS: f32 = 0.7; // radio para las colisiones
+const THRUST: f32 = 20.0; // aceleración con el acelerador a fondo
 const BOOST: f32 = 3.0;
 const LIFT: f32 = 10.0;
 const MAX_SPEED: f32 = 45.0;
 const MAX_BOOST_SPEED: f32 = 130.0;
 const DRAG: f32 = 0.12;
 const BRAKE_DRAG: f32 = 2.2;
-const TURN_RATE: f32 = 1.5;    // rad/s
+const TURN_RATE: f32 = 1.5; // rad/s
 const PITCH_RATE: f32 = 1.2;
-const RESPONSE: f32 = 4.0;     // qué tan rápido llega el giro a su objetivo
+const RESPONSE: f32 = 4.0; // qué tan rápido llega el giro a su objetivo
 
 /// Entrada ya interpretada (teclado o piloto automático). Valores en [-1, 1].
 #[derive(Clone, Copy, Debug, Default)]

@@ -5,8 +5,8 @@
 //! tarde más en dibujarse.
 use crate::framebuffer::Framebuffer;
 use crate::game::{Game, Input, Mode};
-use crate::render::{Meshes, Renderer};
 use crate::math;
+use crate::render::{Meshes, Renderer};
 use crate::ship::Controls;
 use noise::OpenSimplex;
 

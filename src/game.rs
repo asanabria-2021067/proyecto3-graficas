@@ -57,7 +57,7 @@ pub struct Game {
     pub decor_seed: u64,
     pub decor: Vec<Vec<Instance>>,
     pub settings: Settings,
-    pub collided: f32, // tiempo desde el último choque (para avisar en el HUD)
+    pub collided: f32,       // tiempo desde el último choque (para avisar en el HUD)
     pub trail: Vec<Vector3>, // posiciones recientes de los motores (estela)
     trail_timer: f32,
     accumulator: f32,
