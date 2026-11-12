@@ -28,9 +28,9 @@ pub fn lava(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
 
     // ---------- 1. Placas de corteza ----------
     let warp = Vector3::new(fbm(nz, p * 2.0, 2), fbm(nz, p * 2.0 + Vector3::new(4.0, 1.0, 0.0), 2), 0.0);
-    let (f1, f2) = cellular(p * 5.0 + warp * 0.6);
+    let (f1, f2) = cellular(p * 7.0 + warp * 1.1);
     let edge = f2 - f1; // ~0 en la frontera entre placas
-    let width = 0.05 + hot * 0.08 + fbm(nz, p * 6.0, 2) * 0.03;
+    let width = 0.035 + hot * 0.06 + fbm(nz, p * 6.0, 2) * 0.03;
     let crack = 1.0 - smoothstep(0.0, width, edge);
 
     // ---------- 2. Mares de lava en las zonas bajas ----------
