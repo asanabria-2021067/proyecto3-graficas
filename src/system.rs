@@ -1,4 +1,4 @@
-//! El sistema solar: el sol y los cinco planetas, todos en el plano eclíptico (y = 0).
+//! El sistema solar: el sol y seis planetas, todos en el plano eclíptico (y = 0).
 //! Las órbitas son circulares y las posiciones dependen del tiempo, no de los cuadros.
 use crate::shaders::{barren, Material, ShadeObject};
 use noise::OpenSimplex;
@@ -108,9 +108,11 @@ impl System {
             body("Kharon", Material::Barren, 4.4, 108.0, 170.0, 260.0, 55.0, 8.0, 2.5, (0.7, 0.6, 0.75)),
             body("Glacia", Material::Ice, 5.0, 142.0, 220.0, 20.0, 34.0, 28.0, 3.0, (0.6, 0.9, 1.0)),
             body("Orvane", Material::GasGiant, 11.0, 192.0, 300.0, 200.0, 22.0, 15.0, 5.0, (0.9, 0.65, 0.45)),
+            body("Mirra", Material::Toon, 2.4, 62.0, 105.0, 250.0, 16.0, 18.0, 2.0, (0.4, 0.85, 0.7)),
         ];
         bodies[0].intensity = 0.5;
         bodies[2].intensity = 0.48; // cobertura de nubes
+        bodies[6].intensity = 0.6;  // florecitas de Mirra
         bodies[3].deformed = true;
         bodies[5].ring = true;
         Self { bodies }
