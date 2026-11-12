@@ -159,4 +159,16 @@ mod tests {
         let numeric = (b.center(10.0 + h) - b.center(10.0 - h)) * (1.0 / (2.0 * h));
         assert!((numeric - b.velocity(10.0, 1.0)).length() < 1e-2);
     }
+
+    #[test]
+    fn las_orbitas_no_se_cruzan() {
+        let s = System::new();
+        let mut planets: Vec<_> = s.bodies.iter().skip(1).collect();
+        planets.sort_by(|a, b| a.orbit_radius.total_cmp(&b.orbit_radius));
+        assert!(planets[0].orbit_radius - planets[0].radius() > s.bodies[0].radius() * 2.0);
+        for w in planets.windows(2) {
+            let gap = w[1].orbit_radius - w[0].orbit_radius;
+            assert!(gap > (w[0].radius() + w[1].radius()) * 1.5, "{} y {}", w[0].name, w[1].name);
+        }
+    }
 }
