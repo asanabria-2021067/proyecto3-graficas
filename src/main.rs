@@ -109,11 +109,16 @@ fn main() {
     let mut texture = make_texture(&mut rl, &fb);
     let mut rgba = Vec::new();
     let mut show_help = true;
+    let mut show_hud = true;
+    let mut saved_msg = 0.0f32; // segundos que queda el aviso de captura guardada
 
     while !rl.window_should_close() {
         let input = read_input(&rl);
         if rl.is_key_pressed(KeyboardKey::KEY_H) {
             show_help = !show_help;
+        }
+        if rl.is_key_pressed(KeyboardKey::KEY_F2) {
+            show_hud = !show_hud; // para grabar sin textos
         }
         if rl.is_key_pressed(KeyboardKey::KEY_F1) {
             // 1 = completa, 2 = mitad, 3 = un tercio (para computadoras lentas)
@@ -128,7 +133,9 @@ fn main() {
         let render_ms = start.elapsed().as_secs_f32() * 1000.0;
         if rl.is_key_pressed(KeyboardKey::KEY_K) {
             fb.save_png(&format!("screenshots/captura_{:.0}.png", rl.get_time() * 1000.0));
+            saved_msg = 2.0;
         }
+        saved_msg -= rl.get_frame_time();
         fb.to_rgba(&mut rgba);
         texture.update_texture(&rgba).expect("update texture");
 
@@ -136,7 +143,16 @@ fn main() {
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(Color::BLACK);
         d.draw_texture_ex(&texture, Vector2::zero(), 0.0, scale as f32, Color::WHITE);
-        draw_hud(&mut d, &game, &report, fps, render_ms, show_help);
+        if show_hud {
+            draw_hud(&mut d, &game, &report, fps, render_ms, show_help);
+        }
+        if game.paused {
+            let w = d.measure_text("PAUSA", 40);
+            d.draw_text("PAUSA", WIDTH / 2 - w / 2, HEIGHT / 2 - 120, 40, Color::new(255, 255, 255, 200));
+        }
+        if saved_msg > 0.0 {
+            d.draw_text("Captura guardada en screenshots/", WIDTH / 2 - 150, HEIGHT - 150, 18, Color::LIGHTGRAY);
+        }
     }
 }
 
@@ -249,6 +265,7 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
             "V       vista del sistema     Mouse der.: mirar",
             "Rueda   distancia de la camara",
             "O orbitas  M minimapa  F1 resolucion  K captura",
+            "F2      ocultar todos los textos",
         ];
         let x = WIDTH - 360;
         let mut y = (HEIGHT as f32 * 0.66) as i32 - 8;
