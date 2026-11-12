@@ -216,4 +216,22 @@ mod tests {
             assert!(!toon::on_path(o.dir));
         }
     }
+
+    #[test]
+    fn el_objeto_se_para_sobre_la_normal() {
+        let noise = OpenSimplex::new(7);
+        let s = System::new();
+        let body = &s.bodies[2];
+        let planet = body.shade_object(37.0);
+        let dir = Vector3::new(0.2, 0.7, -0.5).normalized();
+        let inst = Instance { kind: Kind::Tree, dir, yaw: 1.0, scale: 0.05 };
+        let (m, _, _) = model_matrix(&inst, body, &planet, &noise, 1.0);
+        // El eje Y del modelo (segunda columna) tiene que apuntar hacia afuera del planeta.
+        let up = Vector3::new(m[0][1], m[1][1], m[2][1]).normalized();
+        assert!((up - planet.to_world(dir)).length() < 1e-4);
+        // Y la base queda sobre la superficie (un poquito hundida).
+        let base = Vector3::new(m[0][3], m[1][3], m[2][3]);
+        let h = (base - planet.center).length();
+        assert!((h - body.radius()).abs() < body.radius() * 0.01);
+    }
 }
