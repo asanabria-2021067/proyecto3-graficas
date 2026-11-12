@@ -88,3 +88,28 @@ impl LocalOrbit {
         ship.bank = damp(ship.bank, -self.turn * 0.4, 5.0, dt);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ship::Ship;
+
+    fn orbita() -> LocalOrbit {
+        let ship = Ship::new(Vector3::new(0.0, 8.0, 0.0), Vector3::new(0.0, 0.0, 1.0));
+        LocalOrbit::enter(1, &ship, Vector3::zero(), 6.0, Vector3::zero())
+    }
+
+    #[test]
+    fn avanzar_da_la_vuelta_al_planeta() {
+        let mut lo = orbita();
+        let inicio = lo.dir;
+        let c = Controls { thrust: 1.0, ..Default::default() };
+        let mut minimo: f32 = 1.0;
+        for _ in 0..120 * 30 {
+            lo.step(&c, 6.0, 1.0 / 120.0);
+            minimo = minimo.min(lo.dir.dot(inicio));
+        }
+        // En algún momento estuvo del otro lado del planeta.
+        assert!(minimo < -0.9);
+    }
+}
