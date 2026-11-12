@@ -1,0 +1,9 @@
+newmtl Tallo
+Kd 0.920 0.860 0.720
+
+newmtl Sombrero
+Kd 0.550 0.220 0.620
+
+newmtl Brillo_puntos
+Kd 1.000 0.900 0.550
+
