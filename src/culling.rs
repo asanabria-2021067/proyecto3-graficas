@@ -67,4 +67,9 @@ mod tests {
     fn esfera_enfrente_se_ve() {
         assert!(frustum().sphere_visible(Vector3::new(0.0, 0.0, -10.0), 1.0));
     }
+
+    #[test]
+    fn esfera_detras_se_descarta() {
+        assert!(!frustum().sphere_visible(Vector3::new(0.0, 0.0, 10.0), 1.0));
+    }
 }
