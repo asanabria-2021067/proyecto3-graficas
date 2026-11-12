@@ -72,4 +72,11 @@ mod tests {
     fn esfera_detras_se_descarta() {
         assert!(!frustum().sphere_visible(Vector3::new(0.0, 0.0, 10.0), 1.0));
     }
+
+    #[test]
+    fn esfera_muy_lejos_o_a_un_lado_se_descarta() {
+        let f = frustum();
+        assert!(!f.sphere_visible(Vector3::new(0.0, 0.0, -500.0), 1.0));
+        assert!(!f.sphere_visible(Vector3::new(50.0, 0.0, -10.0), 1.0));
+    }
 }
