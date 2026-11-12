@@ -261,4 +261,16 @@ mod tests {
         assert!((st.triangles_back as f32 - half).abs() < half * 0.15);
         assert!(st.triangles_drawn > 0);
     }
+
+    #[test]
+    fn el_depth_test_se_queda_con_lo_mas_cercano() {
+        let mesh = geometry::icosphere(2);
+        let mut fb = Framebuffer::new(64, 64);
+        let mut st = Stats::default();
+        let lejos = math::model_matrix(Vector3::new(0.0, 0.0, -2.0), 1.0, 0.0, 0.0);
+        draw(&mut fb, &camera(), &DrawCall { id: 2, ..call(&mesh, lejos) }, &mut st);
+        draw(&mut fb, &camera(), &call(&mesh, math::identity()), &mut st);
+        // En el centro de la pantalla tiene que ganar la esfera de adelante (id 1).
+        assert_eq!(fb.gbuf[32 * 64 + 32].id, 1);
+    }
 }
