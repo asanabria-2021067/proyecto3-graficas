@@ -304,4 +304,20 @@ mod tests {
         };
         assert!((run(30.0) - run(144.0)).length() < 0.6);
     }
+
+    #[test]
+    fn la_nave_no_atraviesa_el_planeta() {
+        let mut g = Game::new(OpenSimplex::new(7));
+        let b = &g.system.bodies[2];
+        let c = b.center(0.0);
+        g.ship = Ship::new(c + Vector3::new(0.0, 0.0, -20.0), Vector3::new(0.0, 0.0, 1.0));
+        g.ship.vel = Vector3::new(0.0, 0.0, 40.0);
+        let mut input = Input::default();
+        input.controls.thrust = 1.0;
+        for _ in 0..90 {
+            g.update(&input, 1.0 / 30.0);
+            let b = &g.system.bodies[2];
+            assert!((g.ship.pos - b.center(g.orbit_time)).length() >= b.radius());
+        }
+    }
 }
