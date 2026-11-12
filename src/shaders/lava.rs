@@ -66,7 +66,7 @@ pub fn lava(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
 
     // La lava brilla sola (no depende del sol). La corteza ilumina un poco su alrededor.
     let mut color = mix(crust_lit, glow, molten);
-    color = color + rgb(0.6, 0.1, 0.0) * ((1.0 - molten) * crack.max(sea * 0.5) * 0.2);
+    color += rgb(0.6, 0.1, 0.0) * ((1.0 - molten) * crack.max(sea * 0.5) * 0.2);
 
     // Humo de la atmósfera: halo rojizo en el borde, se ve también de noche.
     let rim = (1.0 - n.dot(v).max(0.0)).powf(2.5);
