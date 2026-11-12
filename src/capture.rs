@@ -134,8 +134,12 @@ pub fn benchmark() {
          Generado con `cargo run --release -- capture rendimiento` (640x360, promedio de 5 cuadros).\n\
          \"Triángulos enviados\" son los que llegan al pipeline; los objetos descartados no mandan ninguno.\n\n",
     );
-    let scenes: [(&str, Option<usize>); 3] =
-        [("Sobre Tessara (superficie)", Some(5)), ("Cerca de Kharon", Some(2)), ("Inicio, en el espacio", None)];
+    let by_name = |name: &str| SHOTS.iter().position(|s| s.name == name);
+    let scenes = [
+        ("Sobre Tessara (superficie)", by_name("tessara_superficie")),
+        ("Cerca de Kharon", by_name("kharon")),
+        ("Inicio, en el espacio", None),
+    ];
     for (title, shot) in scenes {
         out.push_str(&format!("## {title}\n\n| Descarte | LOD | Objetos dibujados | Objetos descartados | Triángulos enviados | Triángulos rasterizados | ms por cuadro |\n|---|---|---|---|---|---|---|\n"));
         for (culling, lod) in [(true, true), (false, true), (true, false), (false, false)] {
