@@ -139,3 +139,17 @@ impl NormalMaps {
         Self { rock: rock_map(noise), cracks: crack_map(noise) }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn las_normales_son_unitarias_y_miran_hacia_afuera() {
+        let map = NormalMap::from_height(32, 5.0, |u, v| (u * TAU).sin() * (v * TAU).cos());
+        for &n in &map.data {
+            assert!((n.length() - 1.0).abs() < 1e-4);
+            assert!(n.z > 0.0);
+        }
+    }
+}
