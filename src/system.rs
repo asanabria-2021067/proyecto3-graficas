@@ -171,4 +171,13 @@ mod tests {
             assert!(gap > (w[0].radius() + w[1].radius()) * 1.5, "{} y {}", w[0].name, w[1].name);
         }
     }
+
+    #[test]
+    fn el_mas_cercano() {
+        let s = System::new();
+        let c = s.bodies[4].center(0.0);
+        let (i, d) = s.nearest(c + Vector3::new(0.0, 10.0, 0.0), 0.0);
+        assert_eq!(i, 4);
+        assert!((d - (10.0 - s.bodies[4].radius())).abs() < 1e-3);
+    }
 }
