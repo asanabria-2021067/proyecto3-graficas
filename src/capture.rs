@@ -57,6 +57,10 @@ fn place(game: &mut Game, s: &Shot) {
 }
 
 pub fn run(filter: Option<&str>) {
+    if filter == Some("cielo") {
+        sky();
+        return;
+    }
     if filter == Some("rendimiento") {
         benchmark();
         return;
@@ -175,4 +179,23 @@ pub fn benchmark() {
     }
     std::fs::write("docs/rendimiento.md", &out).expect("no se pudo escribir docs/rendimiento.md");
     println!("{out}");
+}
+
+/// `cargo run --release -- capture cielo`: el cielo completo en una sola imagen
+/// (proyección equirectangular), para revisar la nebulosa y las estrellas.
+pub fn sky() {
+    let noise = OpenSimplex::new(7);
+    let bg = crate::background::Background::new(&noise);
+    let (w, h) = (1024usize, 512usize);
+    let mut fb = Framebuffer::new(w, h);
+    for y in 0..h {
+        for x in 0..w {
+            let lon = x as f32 / w as f32 * std::f32::consts::TAU - std::f32::consts::PI;
+            let lat = (0.5 - y as f32 / h as f32) * std::f32::consts::PI;
+            let d = Vector3::new(lat.cos() * lon.cos(), lat.sin(), lat.cos() * lon.sin());
+            fb.color[y * w + x] = bg.sample(d);
+        }
+    }
+    fb.save_png("docs/cielo.png");
+    println!("docs/cielo.png");
 }
