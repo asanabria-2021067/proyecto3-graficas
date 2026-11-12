@@ -155,4 +155,13 @@ mod tests {
         assert!(s.forward.x < -0.1);
         assert!((s.forward.length() - 1.0).abs() < 1e-4);
     }
+
+    #[test]
+    fn la_base_sigue_ortonormal() {
+        let mut s = nave();
+        let c = Controls { thrust: 0.5, yaw: 0.7, pitch: -0.6, ..Default::default() };
+        volar(&mut s, c, 5.0, 1.0 / 120.0);
+        assert!(s.forward.dot(s.up).abs() < 1e-3);
+        assert!((s.up.length() - 1.0).abs() < 1e-3);
+    }
 }
