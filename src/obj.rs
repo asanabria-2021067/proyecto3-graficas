@@ -106,4 +106,11 @@ mod tests {
         assert_eq!(m.indices.len(), 224);
         assert!(m.radius > 4.0);
     }
+
+    #[test]
+    fn motores_marcados_como_emisivos() {
+        let m = load("assets/nave.obj").unwrap();
+        let motores = m.vertices.iter().filter(|v| v.emit > 0.5).count();
+        assert!(motores > 0 && motores < m.vertices.len() / 2);
+    }
 }
