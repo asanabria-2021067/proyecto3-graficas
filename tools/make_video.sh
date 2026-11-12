@@ -10,14 +10,16 @@ if [ ! -d docs/frames ]; then
   exit 1
 fi
 
+# El sonido sale del mismo recorrido (docs/frames/audio.wav). Si se pasa una canción,
+# se mezcla abajo del sonido de la nave.
+AUDIO=docs/frames/audio.wav
 if [ $# -ge 1 ]; then
-  # Con música: se corta al largo del video y se baja el volumen al final.
-  ffmpeg -y -framerate 30 -i docs/frames/%05d.png -i "$1" \
-    -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p \
-    -c:a aac -b:a 160k -af "afade=t=out:st=72:d=4" -shortest docs/recorrido.mp4
+  ffmpeg -y -framerate 30 -i docs/frames/%05d.png -i "$AUDIO" -i "$1" \
+    -filter_complex "[2:a]volume=0.35,afade=t=out:st=92:d=5[m];[1:a][m]amix=inputs=2:duration=first,loudnorm=I=-16[a]" \
+    -map 0:v -map "[a]" -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest docs/recorrido.mp4
 else
-  ffmpeg -y -framerate 30 -i docs/frames/%05d.png \
-    -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p docs/recorrido.mp4
+  ffmpeg -y -framerate 30 -i docs/frames/%05d.png -i "$AUDIO" \
+    -af "loudnorm=I=-16" -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest docs/recorrido.mp4
 fi
 
 # Versión liviana (720p, menos de 10 MB) para arrastrarla al editor del README en GitHub:
