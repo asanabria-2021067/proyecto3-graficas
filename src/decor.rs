@@ -9,7 +9,7 @@ use crate::mesh::Mesh;
 use crate::obj;
 use crate::rng::Rng;
 use crate::shaders::noise_helpers::{fbm, ridged};
-use crate::shaders::{rocky, Material, ShadeObject};
+use crate::shaders::{rocky, toon, Material, ShadeObject};
 use crate::system::Body;
 use noise::OpenSimplex;
 use raylib::prelude::*;
@@ -21,9 +21,11 @@ pub enum Kind {
     House,
     Crystal,
     Obelisk,
+    Mushroom,
+    Lighthouse,
 }
 
-pub const KINDS: [Kind; 5] = [Kind::Tree, Kind::Rock, Kind::House, Kind::Crystal, Kind::Obelisk];
+pub const KINDS: [Kind; 7] = [Kind::Tree, Kind::Rock, Kind::House, Kind::Crystal, Kind::Obelisk, Kind::Mushroom, Kind::Lighthouse];
 
 impl Kind {
     fn file(self) -> &'static str {
@@ -33,6 +35,8 @@ impl Kind {
             Kind::House => "assets/casa.obj",
             Kind::Crystal => "assets/cristal.obj",
             Kind::Obelisk => "assets/obelisco.obj",
+            Kind::Mushroom => "assets/hongo.obj",
+            Kind::Lighthouse => "assets/faro.obj",
         }
     }
 }
@@ -97,6 +101,17 @@ fn choose(material: Material, noise: &OpenSimplex, dir: Vector3, rng: &mut Rng) 
                 (rng.f32() < 0.3).then(|| (Kind::Rock, rng.range(0.03, 0.06)))
             }
         }
+        Material::Toon => {
+            // Hongos y árboles fuera del camino en espiral.
+            if toon::on_path(dir) {
+                return None;
+            }
+            if rng.f32() < 0.6 {
+                Some((Kind::Mushroom, rng.range(0.11, 0.18)))
+            } else {
+                (rng.f32() < 0.5).then(|| (Kind::Tree, rng.range(0.12, 0.17)))
+            }
+        }
         _ => None,
     }
 }
@@ -107,6 +122,7 @@ fn attempts(material: Material) -> usize {
         Material::Lava => 220,
         Material::Ice => 260,
         Material::Barren => 300,
+        Material::Toon => 70,
         _ => 0,
     }
 }
@@ -114,6 +130,10 @@ fn attempts(material: Material) -> usize {
 pub fn scatter(body: &Body, noise: &OpenSimplex, seed: u64) -> Vec<Instance> {
     let mut rng = Rng::new(seed ^ (body.name.len() as u64 * 7919) ^ body.orbit_radius as u64);
     let mut out = Vec::new();
+    if body.material == Material::Toon {
+        // Un solo faro, siempre en el mismo lugar cerca del polo norte.
+        out.push(Instance { kind: Kind::Lighthouse, dir: Vector3::new(0.25, 0.93, 0.27).normalized(), yaw: 0.6, scale: 0.22 });
+    }
     for _ in 0..attempts(body.material) {
         let dir = rng.on_sphere();
         let yaw = rng.range(0.0, std::f32::consts::TAU);
