@@ -152,4 +152,11 @@ mod tests {
             assert!(n.z > 0.0);
         }
     }
+
+    #[test]
+    fn la_textura_se_repite_sin_costura() {
+        let map = NormalMap::from_height(32, 5.0, |u, v| (u * TAU).sin() + (v * TAU * 2.0).cos());
+        assert!((map.sample(0.0, 0.3) - map.sample(1.0, 0.3)).length() < 1e-4);
+        assert!((map.sample(0.25, 0.999) - map.sample(0.25, -0.001)).length() < 1e-3);
+    }
 }
