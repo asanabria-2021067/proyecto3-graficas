@@ -1,63 +1,93 @@
+mod autopilot;
+mod background;
+mod camera;
+mod capture;
 mod culling;
+mod decor;
 mod framebuffer;
+mod game;
 mod geometry;
+mod local_orbit;
 mod math;
 mod mesh;
+mod normal_map;
 mod obj;
+mod overlay;
 mod pipeline;
+mod render;
+mod rng;
+mod shaders;
+mod ship;
+mod system;
 
 use framebuffer::Framebuffer;
-use pipeline::{DrawCall, Stats};
+use game::{Game, Input, Mode};
+use noise::OpenSimplex;
 use raylib::prelude::*;
-use rayon::prelude::*;
+use render::{Meshes, Renderer};
 
 const WIDTH: i32 = 1280;
 const HEIGHT: i32 = 720;
-const SCALE: usize = 2;
 
-fn render(fb: &mut Framebuffer, sphere: &mesh::Mesh, ship: &mesh::Mesh, t: f32) -> Stats {
-    fb.clear();
-    let mut stats = Stats::default();
-    let eye = Vector3::new(0.0, 1.5, 6.0);
-    let view = math::look_at(eye, Vector3::zero(), Vector3::new(0.0, 1.0, 0.0));
-    let proj = math::perspective(60f32.to_radians(), fb.width as f32 / fb.height as f32, 0.05, 2000.0);
-    let vp = math::mul(&proj, &view);
-    let planet = DrawCall {
-        mesh: sphere,
-        model: math::model_matrix(Vector3::new(-1.5, 0.0, 0.0), 1.5, 0.3, t * 0.5),
-        id: 1,
-        double_sided: false,
-        alpha: None,
-    };
-    pipeline::draw(fb, &vp, &planet, &mut stats);
-    let ship_call = DrawCall {
-        mesh: ship,
-        model: math::mul(&math::translation(Vector3::new(2.0, 0.0, 1.0)), &math::mul(&math::rotation_y(t), &math::scale(0.3))),
-        id: 2,
-        double_sided: false,
-        alpha: None,
-    };
-    pipeline::draw(fb, &vp, &ship_call, &mut stats);
-
-    let light = Vector3::new(1.0, 0.6, 0.8).normalized();
-    fb.color.par_iter_mut().zip(fb.gbuf.par_iter()).for_each(|(c, s)| {
-        *c = if s.id == 0 {
-            Vector3::new(0.01, 0.01, 0.03)
-        } else {
-            let n = s.normal.normalized();
-            s.color * (0.05 + n.dot(light).max(0.0))
-        };
-    });
-    stats
+fn read_input(rl: &RaylibHandle) -> Input {
+    use KeyboardKey::*;
+    let down = |k| rl.is_key_down(k);
+    let pressed = |k| rl.is_key_pressed(k);
+    let axis = |pos, neg| (down(pos) as i32 - down(neg) as i32) as f32;
+    let mut i = Input::default();
+    i.controls.thrust = axis(KEY_W, KEY_S);
+    i.controls.yaw = axis(KEY_D, KEY_A);
+    i.controls.pitch = axis(KEY_UP, KEY_DOWN);
+    i.controls.lift = axis(KEY_E, KEY_Q);
+    i.controls.brake = down(KEY_SPACE);
+    i.controls.boost = down(KEY_LEFT_SHIFT) || down(KEY_RIGHT_SHIFT);
+    i.toggle_local = pressed(KEY_TAB);
+    for (k, body) in [(KEY_ONE, 1), (KEY_TWO, 2), (KEY_THREE, 3), (KEY_FOUR, 4), (KEY_FIVE, 5)] {
+        if pressed(k) {
+            i.autopilot = Some(body);
+        }
+    }
+    i.toggle_overview = pressed(KEY_V);
+    i.toggle_gravity = pressed(KEY_G);
+    i.toggle_pause = pressed(KEY_P);
+    i.toggle_culling = pressed(KEY_C);
+    i.toggle_lod = pressed(KEY_L);
+    i.toggle_normals = pressed(KEY_N);
+    i.toggle_orbits = pressed(KEY_O);
+    i.toggle_minimap = pressed(KEY_M);
+    i.seed_delta = pressed(KEY_RIGHT_BRACKET) as i32 - pressed(KEY_LEFT_BRACKET) as i32;
+    let dt = rl.get_frame_time();
+    i.time_scale_delta = axis(KEY_EQUAL, KEY_MINUS) * dt;
+    i.radius_delta = axis(KEY_ZERO, KEY_NINE) * dt * 0.4;
+    i.intensity_delta = axis(KEY_PERIOD, KEY_COMMA) * dt * 0.4;
+    if rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_RIGHT) {
+        let d = rl.get_mouse_delta();
+        i.look = (-d.x * 0.005, d.y * 0.005);
+        i.dragging = true;
+    }
+    i.zoom = rl.get_mouse_wheel_move();
+    i
 }
 
 fn main() {
-    let sphere = geometry::icosphere(4);
-    let ship = obj::load("assets/nave.obj").unwrap_or_else(|e| panic!("{e}"));
-    let mut fb = Framebuffer::new(WIDTH as usize / SCALE, HEIGHT as usize / SCALE);
+    let args: Vec<String> = std::env::args().collect();
+    if let Some(i) = args.iter().position(|a| a == "capture") {
+        capture::run(args.get(i + 1).map(|s| s.as_str()));
+        return;
+    }
+    let noise = OpenSimplex::new(7);
+    let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
+    let renderer = Renderer::new(noise.clone());
+    let mut game = Game::new(noise);
+
+    let mut scale = 2usize; // 1 = resolución completa, 2 = mitad (más FPS)
+    let mut fb = Framebuffer::new(WIDTH as usize / scale, HEIGHT as usize / scale);
 
     if std::env::args().any(|a| a == "shot") {
-        render(&mut fb, &sphere, &ship, 0.7);
+        for _ in 0..30 {
+            game.update(&Input::default(), 1.0 / 30.0);
+        }
+        renderer.render(&mut fb, &meshes, &game.frame());
         fb.save_png("screenshots/prueba.png");
         return;
     }
@@ -67,19 +97,128 @@ fn main() {
         .title("Proyecto 3 - Space Travel")
         .build();
     rl.set_target_fps(60);
-    let img = Image::gen_image_color(fb.width as i32, fb.height as i32, Color::BLACK);
-    let mut texture = rl.load_texture_from_image(&thread, &img).expect("textura");
+    rl.set_exit_key(None);
+    let make_texture = |rl: &mut RaylibHandle, fb: &Framebuffer| {
+        let img = Image::gen_image_color(fb.width as i32, fb.height as i32, Color::BLACK);
+        rl.load_texture_from_image(&thread, &img).expect("textura")
+    };
+    let mut texture = make_texture(&mut rl, &fb);
     let mut rgba = Vec::new();
+    let mut show_help = true;
 
     while !rl.window_should_close() {
-        let t = rl.get_time() as f32;
-        let stats = render(&mut fb, &sphere, &ship, t);
+        let input = read_input(&rl);
+        if rl.is_key_pressed(KeyboardKey::KEY_H) {
+            show_help = !show_help;
+        }
+        if rl.is_key_pressed(KeyboardKey::KEY_F1) {
+            scale = if scale == 1 { 2 } else { 1 };
+            fb = Framebuffer::new(WIDTH as usize / scale, HEIGHT as usize / scale);
+            texture = make_texture(&mut rl, &fb);
+        }
+        game.update(&input, rl.get_frame_time());
+
+        let start = std::time::Instant::now();
+        let report = renderer.render(&mut fb, &meshes, &game.frame());
+        let render_ms = start.elapsed().as_secs_f32() * 1000.0;
+        if rl.is_key_pressed(KeyboardKey::KEY_K) {
+            fb.save_png(&format!("screenshots/captura_{:.0}.png", rl.get_time() * 1000.0));
+        }
         fb.to_rgba(&mut rgba);
         texture.update_texture(&rgba).expect("update texture");
+
         let fps = rl.get_fps();
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(Color::BLACK);
-        d.draw_texture_ex(&texture, Vector2::zero(), 0.0, SCALE as f32, Color::WHITE);
-        d.draw_text(&format!("{fps} FPS  triangulos: {}", stats.triangles_drawn), 12, 10, 20, Color::RAYWHITE);
+        d.draw_texture_ex(&texture, Vector2::zero(), 0.0, scale as f32, Color::WHITE);
+        draw_hud(&mut d, &game, &report, fps, render_ms, show_help);
+    }
+}
+
+fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps: u32, ms: f32, help: bool) {
+    let white = Color::RAYWHITE;
+    let gray = Color::new(200, 205, 215, 255);
+    for l in &report.labels {
+        let (x, y) = ((l.x * WIDTH as f32) as i32, (l.y * HEIGHT as f32) as i32);
+        let text = format!("{}  {:.0} u", l.name, l.distance.max(0.0));
+        let w = d.measure_text(&text, 16);
+        d.draw_text(&text, x - w / 2, y - 18, 16, gray);
+    }
+
+    let mode = match game.mode {
+        Mode::Free if game.autopilot.is_some() => "piloto automatico",
+        Mode::Free => "vuelo libre",
+        Mode::Local(_) => "modo local (orbita)",
+    };
+    let sel = game.selected();
+    let body = &game.system.bodies[sel];
+    let (_, alt) = game.system.nearest(game.ship.pos, game.orbit_time);
+    let mut y = 10;
+    let mut line = |d: &mut RaylibDrawHandle, s: &str, size: i32, c: Color| {
+        d.draw_text(s, 12, y, size, c);
+        y += size + 4;
+    };
+    line(d, &format!("{fps} FPS  ({ms:.1} ms render)"), 20, white);
+    line(d, &format!("Modo: {mode}   Velocidad: {:.1} u/s", game.ship.speed()), 18, white);
+    line(d, &format!("Cerca de: {}   altura: {:.1} u", body.name, alt.max(0.0)), 18, white);
+    if let Some(t) = game.autopilot {
+        line(d, &format!("Viajando a {}", game.system.bodies[t].name), 18, Color::GOLD);
+    }
+    if game.gravity_on {
+        line(d, &format!("Gravedad: {:.2} u/s2", game.gravity.length()), 16, gray);
+    } else {
+        line(d, "Gravedad: apagada", 16, gray);
+    }
+    if game.collided < 1.0 {
+        line(d, "Choque!", 18, Color::ORANGE);
+    }
+
+    let s = &report.stats;
+    let on = |b: bool| if b { "si" } else { "no" };
+    let st = &game.settings;
+    let lod_txt: Vec<String> = game.system.bodies.iter().zip(&report.lods).map(|(b, l)| format!("{}:{}", &b.name[..3], l)).collect();
+    let bottom = [
+        format!(
+            "Triangulos: {} dibujados, {} fuera de vista, {} de espaldas  (de {})",
+            s.triangles_drawn, s.triangles_frustum, s.triangles_back, s.triangles_in
+        ),
+        format!(
+            "Objetos: {} dibujados, {} descartados   Superficie: {} dibujados, {} descartados",
+            s.objects, s.objects_culled, report.decor_drawn, report.decor_culled
+        ),
+        format!("LOD: {}", lod_txt.join("  ")),
+        format!(
+            "[C] descarte: {}  [L] LOD: {}  [N] normales: {}  [G] gravedad: {}  [P] pausa: {}",
+            on(st.culling), on(st.lod), on(st.normal_mapping), on(game.gravity_on), on(game.paused)
+        ),
+        format!(
+            "{}: [9/0] radio x{:.2}  [,/.] intensidad {:.2}   [-/=] velocidad orbital x{:.2}   [ [/] ] semilla {}",
+            body.name, body.radius_scale, body.intensity, game.time_scale, game.decor_seed
+        ),
+    ];
+    for (i, t) in bottom.iter().enumerate() {
+        d.draw_text(t, 12, HEIGHT - 22 * (bottom.len() - i) as i32 - 4, 16, gray);
+    }
+
+    if help {
+        let lines = [
+            "CONTROLES   (H oculta esta ayuda)",
+            "W / S   acelerar / reversa",
+            "A / D   girar     Flechas: subir/bajar la nariz",
+            "Q / E   bajar / subir      Espacio: frenar",
+            "Shift   turbo",
+            "Tab     modo local cerca de un planeta",
+            "1-5     piloto automatico a un planeta",
+            "V       vista del sistema     Mouse der.: mirar",
+            "Rueda   distancia de la camara",
+            "O orbitas  M minimapa  F1 resolucion  K captura",
+        ];
+        let x = WIDTH - 360;
+        let mut y = (HEIGHT as f32 * 0.66) as i32 - 8;
+        d.draw_rectangle(x - 10, y - 6, 352, lines.len() as i32 * 20 + 10, Color::new(0, 0, 10, 150));
+        for l in lines {
+            d.draw_text(l, x, y, 16, gray);
+            y += 20;
+        }
     }
 }
