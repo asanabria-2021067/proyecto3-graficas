@@ -8,7 +8,7 @@ const DECEL: f32 = 10.0; // con cuánta fuerza piensa frenar al llegar
 
 /// Distancia al centro a la que se detiene.
 pub fn stop_distance(radius: f32) -> f32 {
-    radius * 2.4 + 3.0
+    radius * 1.8 + 2.0
 }
 
 /// Devuelve los controles para este paso y si ya llegó.
