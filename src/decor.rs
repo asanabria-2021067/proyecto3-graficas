@@ -234,4 +234,20 @@ mod tests {
         let h = (base - planet.center).length();
         assert!((h - body.radius()).abs() < body.radius() * 0.01);
     }
+
+    #[test]
+    fn el_objeto_gira_con_el_planeta() {
+        let noise = OpenSimplex::new(7);
+        let s = System::new();
+        let body = &s.bodies[2];
+        let inst = Instance { kind: Kind::Rock, dir: Vector3::new(1.0, 0.0, 0.0), yaw: 0.0, scale: 0.05 };
+        let base = |t: f32| {
+            let p = body.shade_object(t);
+            let (m, _, _) = model_matrix(&inst, body, &p, &noise, 1.0);
+            Vector3::new(m[0][3], m[1][3], m[2][3]) - p.center
+        };
+        // Medio día de giro después, el objeto está del otro lado.
+        let half = body.spin_period / 2.0;
+        assert!(base(0.0).dot(base(half)) < 0.0);
+    }
 }
