@@ -284,3 +284,24 @@ impl Game {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn la_fisica_no_depende_de_los_fps() {
+        // Simular 3 s a 30 FPS y a 144 FPS tiene que dejar la nave casi en el mismo lugar.
+        let run = |fps: f32| {
+            let mut g = Game::new(OpenSimplex::new(7));
+            let mut input = Input::default();
+            input.controls.thrust = 1.0;
+            input.controls.yaw = 0.4;
+            for _ in 0..(3.0 * fps) as usize {
+                g.update(&input, 1.0 / fps);
+            }
+            g.ship.pos
+        };
+        assert!((run(30.0) - run(144.0)).length() < 0.6);
+    }
+}
