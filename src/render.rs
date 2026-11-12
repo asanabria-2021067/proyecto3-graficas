@@ -12,7 +12,7 @@ use crate::normal_map::NormalMaps;
 use crate::overlay;
 use crate::pipeline::{self, DrawCall, Stats};
 use crate::serpent::Serpent;
-use crate::shaders::{self, barren, ring, Globals, Material, ShadeObject};
+use crate::shaders::{self, Globals, Material, ShadeObject, barren, ring};
 use crate::system::System;
 use noise::OpenSimplex;
 use raylib::prelude::*;
@@ -178,7 +178,12 @@ impl Renderer {
             }
             let mesh = if body.deformed { &meshes.deformed[level] } else { &meshes.sphere[level] };
             let model = math::model_matrix(so.center, r, so.tilt, so.spin);
-            pipeline::draw(fb, &vp, &DrawCall { mesh, model, id: i as u16 + 1, double_sided: false, alpha: None }, &mut report.stats);
+            pipeline::draw(
+                fb,
+                &vp,
+                &DrawCall { mesh, model, id: i as u16 + 1, double_sided: false, alpha: None },
+                &mut report.stats,
+            );
 
             if body.ring {
                 let mut ro = so;
@@ -204,7 +209,12 @@ impl Renderer {
                         s.intensity = part.param;
                         objects.push(s);
                         let id = objects.len() as u16 - 1;
-                        pipeline::draw(fb, &vp, &DrawCall { mesh: part.mesh, model: part.model, id, double_sided: false, alpha: None }, &mut report.stats);
+                        pipeline::draw(
+                            fb,
+                            &vp,
+                            &DrawCall { mesh: part.mesh, model: part.model, id, double_sided: false, alpha: None },
+                            &mut report.stats,
+                        );
                     }
                 }
             }
@@ -240,7 +250,12 @@ impl Renderer {
             let mut so = ShadeObject::new(Material::Ship);
             so.intensity = f.ship_thrust;
             objects[ID_SHIP as usize] = so;
-            pipeline::draw(fb, &vp, &DrawCall { mesh: &meshes.ship, model, id: ID_SHIP, double_sided: false, alpha: None }, &mut report.stats);
+            pipeline::draw(
+                fb,
+                &vp,
+                &DrawCall { mesh: &meshes.ship, model, id: ID_SHIP, double_sided: false, alpha: None },
+                &mut report.stats,
+            );
         }
 
         // ---------- Fragment shaders (en paralelo, una vez por píxel visible) ----------
@@ -259,21 +274,17 @@ impl Renderer {
         let (sx, sy) = (1.0 / proj[0][0], 1.0 / proj[1][1]);
         let (w, h) = (fb.width, fb.height);
         let bg = &self.background;
-        fb.color
-            .par_chunks_mut(w)
-            .zip(fb.gbuf.par_chunks(w))
-            .enumerate()
-            .for_each(|(y, (row, grow))| {
-                let ndc_y = 1.0 - (y as f32 + 0.5) / h as f32 * 2.0;
-                for (x, (c, s)) in row.iter_mut().zip(grow).enumerate() {
-                    *c = if s.id == 0 {
-                        let ndc_x = (x as f32 + 0.5) / w as f32 * 2.0 - 1.0;
-                        bg.sample((right * (ndc_x * sx) + up * (ndc_y * sy) + fwd).normalized())
-                    } else {
-                        shaders::fragment_shader(s, &objects[s.id as usize], &globals)
-                    };
-                }
-            });
+        fb.color.par_chunks_mut(w).zip(fb.gbuf.par_chunks(w)).enumerate().for_each(|(y, (row, grow))| {
+            let ndc_y = 1.0 - (y as f32 + 0.5) / h as f32 * 2.0;
+            for (x, (c, s)) in row.iter_mut().zip(grow).enumerate() {
+                *c = if s.id == 0 {
+                    let ndc_x = (x as f32 + 0.5) / w as f32 * 2.0 - 1.0;
+                    bg.sample((right * (ndc_x * sx) + up * (ndc_y * sy) + fwd).normalized())
+                } else {
+                    shaders::fragment_shader(s, &objects[s.id as usize], &globals)
+                };
+            }
+        });
 
         self.background.draw_stars(fb, &vp);
         overlay::trail(fb, &vp, f.trail);

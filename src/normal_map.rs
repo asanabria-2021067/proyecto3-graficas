@@ -79,12 +79,7 @@ fn torus_fbm(noise: &OpenSimplex, u: f32, v: f32, freq: f32, octaves: u32) -> f3
     let (mut sum, mut amp, mut f, mut norm) = (0.0, 0.5, freq, 0.0);
     for _ in 0..octaves {
         let (a, b) = (u * TAU, v * TAU);
-        let p = [
-            (a.cos() * f) as f64,
-            (a.sin() * f) as f64,
-            (b.cos() * f) as f64,
-            (b.sin() * f) as f64,
-        ];
+        let p = [(a.cos() * f) as f64, (a.sin() * f) as f64, (b.cos() * f) as f64, (b.sin() * f) as f64];
         sum += noise.get(p) as f32 * amp;
         norm += amp;
         amp *= 0.5;

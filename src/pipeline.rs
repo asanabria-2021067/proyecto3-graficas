@@ -93,12 +93,7 @@ struct ScreenVertex {
 
 fn to_screen(c: &ClipVertex, width: f32, height: f32) -> ScreenVertex {
     let iw = 1.0 / c.clip[3];
-    ScreenVertex {
-        x: (c.clip[0] * iw + 1.0) * 0.5 * width,
-        y: (1.0 - c.clip[1] * iw) * 0.5 * height,
-        iw,
-        v: *c,
-    }
+    ScreenVertex { x: (c.clip[0] * iw + 1.0) * 0.5 * width, y: (1.0 - c.clip[1] * iw) * 0.5 * height, iw, v: *c }
 }
 
 /// Recorte contra el plano cercano (z = -w) con Sutherland-Hodgman.

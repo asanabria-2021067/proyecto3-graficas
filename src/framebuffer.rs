@@ -14,7 +14,7 @@ pub struct GSample {
     pub obj: Vector3,    // posición en el espacio del objeto (para los patrones de ruido)
     pub color: Vector3,  // color del vértice (material del .obj)
     pub emit: f32,
-    pub id: u16,         // qué objeto quedó en este píxel (0 = fondo)
+    pub id: u16, // qué objeto quedó en este píxel (0 = fondo)
 }
 
 impl GSample {
@@ -42,13 +42,7 @@ pub struct Framebuffer {
 impl Framebuffer {
     pub fn new(width: usize, height: usize) -> Self {
         let n = width * height;
-        Self {
-            width,
-            height,
-            color: vec![Vector3::zero(); n],
-            depth: vec![0.0; n],
-            gbuf: vec![GSample::EMPTY; n],
-        }
+        Self { width, height, color: vec![Vector3::zero(); n], depth: vec![0.0; n], gbuf: vec![GSample::EMPTY; n] }
     }
 
     pub fn clear(&mut self) {
@@ -80,8 +74,7 @@ impl Framebuffer {
     pub fn save_png(&self, path: &str) {
         let mut rgba = Vec::new();
         self.to_rgba(&mut rgba);
-        let img = image::RgbaImage::from_raw(self.width as u32, self.height as u32, rgba)
-            .expect("tamaño de imagen");
+        let img = image::RgbaImage::from_raw(self.width as u32, self.height as u32, rgba).expect("tamaño de imagen");
         if let Some(dir) = std::path::Path::new(path).parent() {
             let _ = std::fs::create_dir_all(dir);
         }

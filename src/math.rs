@@ -64,22 +64,12 @@ pub fn scale(s: f32) -> Mat4 {
 
 pub fn rotation_y(a: f32) -> Mat4 {
     let (s, c) = a.sin_cos();
-    [
-        [c, 0.0, s, 0.0],
-        [0.0, 1.0, 0.0, 0.0],
-        [-s, 0.0, c, 0.0],
-        [0.0, 0.0, 0.0, 1.0],
-    ]
+    [[c, 0.0, s, 0.0], [0.0, 1.0, 0.0, 0.0], [-s, 0.0, c, 0.0], [0.0, 0.0, 0.0, 1.0]]
 }
 
 pub fn rotation_z(a: f32) -> Mat4 {
     let (s, c) = a.sin_cos();
-    [
-        [c, -s, 0.0, 0.0],
-        [s, c, 0.0, 0.0],
-        [0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0],
-    ]
+    [[c, -s, 0.0, 0.0], [s, c, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
 }
 
 /// Matriz de modelo a partir de una base (derecha, arriba, adelante) ya ortonormal.
@@ -102,12 +92,7 @@ pub fn look_at(eye: Vector3, target: Vector3, up: Vector3) -> Mat4 {
     let f = (target - eye).normalized();
     let r = f.cross(up).normalized();
     let u = r.cross(f);
-    [
-        [r.x, r.y, r.z, -r.dot(eye)],
-        [u.x, u.y, u.z, -u.dot(eye)],
-        [-f.x, -f.y, -f.z, f.dot(eye)],
-        [0.0, 0.0, 0.0, 1.0],
-    ]
+    [[r.x, r.y, r.z, -r.dot(eye)], [u.x, u.y, u.z, -u.dot(eye)], [-f.x, -f.y, -f.z, f.dot(eye)], [0.0, 0.0, 0.0, 1.0]]
 }
 
 pub fn perspective(fovy: f32, aspect: f32, near: f32, far: f32) -> Mat4 {
@@ -200,7 +185,13 @@ mod tests {
     #[test]
     fn from_basis_conserva_la_orientacion() {
         // Con la base del mundo tiene que salir lo mismo que una traslación + escala.
-        let m = from_basis(Vector3::new(1.0, 0.0, 0.0), Vector3::new(1.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 1.0), 2.0);
+        let m = from_basis(
+            Vector3::new(1.0, 0.0, 0.0),
+            Vector3::new(1.0, 0.0, 0.0),
+            Vector3::new(0.0, 1.0, 0.0),
+            Vector3::new(0.0, 0.0, 1.0),
+            2.0,
+        );
         assert!(close(transform_point(&m, Vector3::new(0.0, 1.0, 0.0)), Vector3::new(1.0, 2.0, 0.0)));
     }
 
