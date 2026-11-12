@@ -118,6 +118,7 @@ pub struct Report {
     pub lods: Vec<usize>,
     pub decor_drawn: u32,
     pub decor_culled: u32,
+    pub decor_tiny: u32, // objetos que no se dibujaron por verse de menos de 2 píxeles
     pub labels: Vec<Label>,
     /// Dónde está el planeta destino en pantalla (x, y en [0, 1]); si está fuera de la
     /// vista se pega al borde y `false` lo indica.
@@ -232,6 +233,12 @@ impl Renderer {
                 if f.settings.culling && !frustum.sphere_visible(center, radius) {
                     report.decor_culled += 1;
                     report.stats.objects_culled += 1;
+                    continue;
+                }
+                // Detalle por objeto: si se vería de menos de 2 píxeles no vale la pena dibujarlo.
+                let dist = (center - f.camera.eye).length();
+                if f.settings.lod && screen_radius(radius, dist, &proj, fb.height) < 1.0 {
+                    report.decor_tiny += 1;
                     continue;
                 }
                 report.decor_drawn += 1;
