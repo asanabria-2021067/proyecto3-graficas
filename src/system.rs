@@ -64,7 +64,7 @@ impl Body {
 
     /// Altura de la superficie en una dirección del objeto (1.0 = esfera perfecta).
     pub fn height(&self, noise: &OpenSimplex, dir_obj: Vector3) -> f32 {
-        if self.deformed { barren::height(noise, dir_obj) } else { 1.0 }
+        if self.deformed { barren::height(noise, dir_obj, 0) } else { 1.0 }
     }
 
     /// Distancia del centro a la superficie en una dirección del mundo.

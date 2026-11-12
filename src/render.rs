@@ -43,7 +43,7 @@ pub struct Meshes {
 impl Meshes {
     pub fn build(noise: &OpenSimplex) -> Result<Self, String> {
         let sphere = geometry::icosphere_lods(MAX_LOD as u32);
-        let deformed = sphere.iter().map(|m| geometry::deform(m, |d| barren::height(noise, d))).collect();
+        let deformed = sphere.iter().map(|m| geometry::deform(m, |d| barren::height(noise, d, 0))).collect();
         Ok(Self {
             sphere,
             deformed,

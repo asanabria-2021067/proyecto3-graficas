@@ -21,16 +21,19 @@ fn crater_profile(d: f32, r: f32, depth: f32) -> f32 {
 
 /// Radio del planeta en la dirección `dir` (1.0 = esfera original). Lo usan la deformación
 /// de la malla, las colisiones de la nave y la colocación de objetos sobre la superficie.
-pub fn height(nz: &OpenSimplex, dir: Vector3) -> f32 {
-    let mut h = 1.0 + fbm(nz, dir * 1.6, 4) * 0.07 + ridged(nz, dir * 2.5 + Vector3::new(4.0, 0.0, 0.0), 3) * 0.06;
+/// Con otra `seed` sale otro terreno (montañas y cráteres en otros lugares).
+pub fn height(nz: &OpenSimplex, dir: Vector3, seed: i32) -> f32 {
+    let offset = Vector3::new(seed as f32 * 17.3, seed as f32 * -9.1, seed as f32 * 5.7);
+    let mut h = 1.0 + fbm(nz, dir * 1.6 + offset, 4) * 0.07 + ridged(nz, dir * 2.5 + Vector3::new(4.0, 0.0, 0.0) + offset, 3) * 0.06;
     for i in 0..CRATERS {
         // Centro y tamaño de cada cráter salen de un hash: siempre los mismos.
-        let c = Vector3::new(hash3(i, 1, 7) * 2.0 - 1.0, hash3(i, 2, 7) * 2.0 - 1.0, hash3(i, 3, 7) * 2.0 - 1.0);
+        let k = 7 + seed * 31;
+        let c = Vector3::new(hash3(i, 1, k) * 2.0 - 1.0, hash3(i, 2, k) * 2.0 - 1.0, hash3(i, 3, k) * 2.0 - 1.0);
         if c.length() < 0.1 {
             continue;
         }
         let c = c.normalized();
-        let r = 0.12 + hash3(i, 4, 7) * 0.25;
+        let r = 0.12 + hash3(i, 4, k) * 0.25;
         let d = dir.dot(c).clamp(-1.0, 1.0).acos();
         if d < r * 1.8 {
             h += crater_profile(d, r, 0.035 + r * 0.08);
