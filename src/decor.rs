@@ -207,4 +207,13 @@ mod tests {
             assert!(rocky::terrain(&noise, o.dir).land > 0.9);
         }
     }
+
+    #[test]
+    fn en_mirra_nada_cae_en_el_camino() {
+        let noise = OpenSimplex::new(7);
+        let s = System::new();
+        for o in scatter(&s.bodies[6], &noise, 7).iter().skip(1) {
+            assert!(!toon::on_path(o.dir));
+        }
+    }
 }
