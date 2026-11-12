@@ -1,0 +1,17 @@
+[package]
+name = "space-travel"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png"] }
+noise = "0.9"
+raylib = "5.5"
+rayon = "1"
+
+[profile.release]
+debug = false
+codegen-units = 4
+
+[profile.dev]
+opt-level = 1
