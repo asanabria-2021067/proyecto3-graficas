@@ -79,6 +79,43 @@ pub fn trail(fb: &mut Framebuffer, vp: &Mat4, points: &[Vector3]) {
     }
 }
 
+/// Halo de atmósfera alrededor de un planeta: luz fuera de la silueta, más fuerte del lado
+/// que mira al sol. Para cada píxel del fondo se calcula a qué distancia pasa su rayo de
+/// vista del centro del planeta: si pasa un poco por fuera del radio, ahí hay atmósfera.
+/// `ray(x, y)` da la dirección de vista de un píxel.
+pub fn atmosphere(fb: &mut Framebuffer, ray: &dyn Fn(usize, usize) -> Vector3, center: Vector3, radius: f32, eye: Vector3, sun: Vector3, color: Vector3) {
+    let to_c = center - eye;
+    let dist = to_c.length();
+    let thick = radius * 0.08;
+    // Si se ve muy chiquito no vale la pena.
+    if radius / dist < 0.01 {
+        return;
+    }
+    let to_sun = (sun - center).normalized();
+    let (w, h) = (fb.width, fb.height);
+    for y in 0..h {
+        for x in 0..w {
+            let i = y * w + x;
+            if fb.gbuf[i].id != 0 {
+                continue;
+            }
+            let d = ray(x, y);
+            let along = to_c.dot(d);
+            if along <= 0.0 {
+                continue;
+            }
+            let closest = d * along - to_c; // del centro al punto más cercano del rayo
+            let miss = closest.length();
+            if miss < radius || miss > radius + thick {
+                continue;
+            }
+            let side = (closest.normalized().dot(to_sun) * 0.5 + 0.5).powi(2);
+            let a = (1.0 - (miss - radius) / thick).powi(2) * 0.55 * (0.15 + side * 0.85);
+            fb.color[i] += color * a;
+        }
+    }
+}
+
 /// Halo alrededor del sol: se suma luz que cae con la distancia al disco.
 /// Solo se suma en píxeles que están detrás del sol (o en el fondo).
 pub fn sun_glow(fb: &mut Framebuffer, vp: &Mat4, proj: &Mat4, sun: Vector3, radius: f32, eye: Vector3) {
