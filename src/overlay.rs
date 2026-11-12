@@ -31,16 +31,17 @@ fn line(fb: &mut Framebuffer, a: (f32, f32, f32), b: (f32, f32, f32), color: Vec
     }
 }
 
-pub fn orbits(fb: &mut Framebuffer, vp: &Mat4, system: &System, highlight: Option<usize>) {
+pub fn orbits(fb: &mut Framebuffer, vp: &Mat4, system: &System, t: f32, highlight: Option<usize>) {
     let (w, h) = (fb.width as f32, fb.height as f32);
     for (i, body) in system.bodies.iter().enumerate().skip(1) {
         let segments = 240;
         let mut prev: Option<(f32, f32, f32)> = None;
         let mut dash = 0;
         let alpha = if highlight == Some(i) { 0.8 } else { 0.35 };
+        let center = body.orbit_center(t); // el sol, o el planeta si es una luna
         for k in 0..=segments {
             let a = k as f32 / segments as f32 * TAU;
-            let p = Vector3::new(a.cos(), 0.0, a.sin()) * body.orbit_radius;
+            let p = center + Vector3::new(a.cos(), 0.0, a.sin()) * body.orbit_radius;
             let c = math::transform(vp, p, 1.0);
             let cur =
                 if c[3] > 0.5 { Some(((c[0] / c[3] + 1.0) * 0.5 * w, (1.0 - c[1] / c[3]) * 0.5 * h, 1.0 / c[3])) } else { None };
@@ -184,7 +185,7 @@ pub fn minimap(fb: &mut Framebuffer, system: &System, t: f32, ship: Vector3, for
             let steps = 90;
             for s in 0..steps {
                 let a = s as f32 / steps as f32 * TAU;
-                let (x, y) = to_px(Vector3::new(a.cos(), 0.0, a.sin()) * b.orbit_radius);
+                let (x, y) = to_px(b.orbit_center(t) + Vector3::new(a.cos(), 0.0, a.sin()) * b.orbit_radius);
                 let alpha = if highlight == Some(i) { 0.7 } else { 0.25 };
                 fb.blend(x as i32, y as i32, b.color, alpha);
             }
