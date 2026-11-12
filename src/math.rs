@@ -152,3 +152,24 @@ pub fn damp_v(current: Vector3, target: Vector3, rate: f32, dt: f32) -> Vector3 
 pub fn reject(v: Vector3, n: Vector3) -> Vector3 {
     v - n * v.dot(n)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn close(a: Vector3, b: Vector3) -> bool {
+        (a - b).length() < 1e-4
+    }
+
+    #[test]
+    fn identidad_no_cambia_nada() {
+        let m = mul(&identity(), &translation(Vector3::new(1.0, 2.0, 3.0)));
+        assert!(close(transform_point(&m, Vector3::zero()), Vector3::new(1.0, 2.0, 3.0)));
+    }
+
+    #[test]
+    fn rotacion_y_un_cuarto_de_vuelta() {
+        let v = rotate_y(Vector3::new(0.0, 0.0, 1.0), std::f32::consts::FRAC_PI_2);
+        assert!(close(v, Vector3::new(1.0, 0.0, 0.0)));
+    }
+}
