@@ -112,3 +112,29 @@ impl Ship {
         math::from_basis(self.pos, right, up, self.forward, SCALE)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn nave() -> Ship {
+        Ship::new(Vector3::zero(), Vector3::new(0.0, 0.0, 1.0))
+    }
+
+    fn volar(ship: &mut Ship, c: Controls, secs: f32, dt: f32) {
+        for _ in 0..(secs / dt).round() as usize {
+            ship.step(&c, Vector3::zero(), dt);
+        }
+    }
+
+    #[test]
+    fn acelerar_es_progresivo() {
+        let mut s = nave();
+        let c = Controls { thrust: 1.0, ..Default::default() };
+        volar(&mut s, c, 0.1, 1.0 / 120.0);
+        let v1 = s.speed();
+        volar(&mut s, c, 0.9, 1.0 / 120.0);
+        // No salta a la velocidad máxima: crece de a poco.
+        assert!(v1 < 1.0 && s.speed() > v1 * 5.0);
+    }
+}
