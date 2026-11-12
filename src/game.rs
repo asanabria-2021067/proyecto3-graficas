@@ -289,6 +289,17 @@ impl Game {
         }
     }
 
+    /// Estado de la nave para el sintetizador de sonido.
+    pub fn sound_params(&self) -> crate::synth::SoundParams {
+        crate::synth::SoundParams {
+            throttle: self.ship.throttle.abs().min(1.0),
+            speed: (self.ship.speed() / 130.0).min(1.0),
+            turn: (-self.ship.yaw_rate / 1.5).clamp(-1.0, 1.0),
+            boost: self.ship.speed() > 50.0,
+            impact: self.camera.shake,
+        }
+    }
+
     pub fn frame(&self) -> Frame<'_> {
         Frame {
             system: &self.system,
