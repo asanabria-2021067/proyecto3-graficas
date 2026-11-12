@@ -1,9 +1,35 @@
-//! El sistema solar: el sol y seis planetas, todos en el plano eclíptico (y = 0).
+//! El sistema solar: el sol, seis planetas y una luna, todos en el plano eclíptico (y = 0).
 //! Las órbitas son circulares y las posiciones dependen del tiempo, no de los cuadros.
 use crate::shaders::{Material, ShadeObject, barren};
 use noise::OpenSimplex;
 use raylib::prelude::*;
 use std::f32::consts::TAU;
+
+/// Órbita circular: radio, segundos por vuelta y ángulo inicial.
+#[derive(Clone, Copy, Debug)]
+pub struct Orbit {
+    pub radius: f32,
+    pub period: f32,
+    pub phase: f32,
+}
+
+impl Orbit {
+    pub fn position(&self, t: f32) -> Vector3 {
+        if self.period <= 0.0 {
+            return Vector3::zero();
+        }
+        let a = self.phase + TAU * t / self.period;
+        Vector3::new(a.cos() * self.radius, 0.0, a.sin() * self.radius)
+    }
+
+    pub fn velocity(&self, t: f32, speed: f32) -> Vector3 {
+        if self.period <= 0.0 {
+            return Vector3::zero();
+        }
+        let a = self.phase + TAU * t / self.period;
+        Vector3::new(-a.sin(), 0.0, a.cos()) * (TAU / self.period * speed * self.radius)
+    }
+}
 
 pub struct Body {
     pub name: &'static str,
@@ -20,6 +46,9 @@ pub struct Body {
     pub deformed: bool,
     pub ring: bool,
     pub color: Vector3, // para el minimapa y la línea de la órbita
+    /// Si es una luna: la órbita del planeta al que le da vueltas.
+    pub parent: Option<Orbit>,
+    pub terrain_seed: i32, // para los cuerpos deformados
 }
 
 impl Body {
@@ -27,23 +56,23 @@ impl Body {
         self.base_radius * self.radius_scale
     }
 
-    pub fn orbit_angle(&self, t: f32) -> f32 {
-        if self.orbit_period <= 0.0 { 0.0 } else { self.orbit_phase + TAU * t / self.orbit_period }
+    pub fn orbit(&self) -> Orbit {
+        Orbit { radius: self.orbit_radius, period: self.orbit_period, phase: self.orbit_phase }
+    }
+
+    /// Centro de la órbita: el sol, o el planeta si es una luna.
+    pub fn orbit_center(&self, t: f32) -> Vector3 {
+        self.parent.map_or(Vector3::zero(), |p| p.position(t))
     }
 
     pub fn center(&self, t: f32) -> Vector3 {
-        let a = self.orbit_angle(t);
-        Vector3::new(a.cos() * self.orbit_radius, 0.0, a.sin() * self.orbit_radius)
+        self.orbit_center(t) + self.orbit().position(t)
     }
 
-    /// Derivada de `center`: velocidad del planeta en su órbita (`speed` = multiplicador del tiempo).
+    /// Derivada de `center`: velocidad del cuerpo en su órbita (`speed` = multiplicador del tiempo).
+    /// Una luna suma la velocidad de su planeta.
     pub fn velocity(&self, t: f32, speed: f32) -> Vector3 {
-        if self.orbit_period <= 0.0 {
-            return Vector3::zero();
-        }
-        let a = self.orbit_angle(t);
-        let w = TAU / self.orbit_period * speed;
-        Vector3::new(-a.sin(), 0.0, a.cos()) * (w * self.orbit_radius)
+        self.parent.map_or(Vector3::zero(), |p| p.velocity(t, speed)) + self.orbit().velocity(t, speed)
     }
 
     pub fn spin(&self, t: f32) -> f32 {
@@ -64,7 +93,7 @@ impl Body {
 
     /// Altura de la superficie en una dirección del objeto (1.0 = esfera perfecta).
     pub fn height(&self, noise: &OpenSimplex, dir_obj: Vector3) -> f32 {
-        if self.deformed { barren::height(noise, dir_obj, 0) } else { 1.0 }
+        if self.deformed { barren::height(noise, dir_obj, self.terrain_seed) } else { 1.0 }
     }
 
     /// Distancia del centro a la superficie en una dirección del mundo.
@@ -100,6 +129,8 @@ impl System {
             deformed: false,
             ring: false,
             color: Vector3::new(color.0, color.1, color.2),
+            parent: None,
+            terrain_seed: 0,
         };
         let mut bodies = vec![
             body("Solmira", Material::Star, 14.0, 0.0, 0.0, 0.0, 90.0, 7.0, 14.0, (1.0, 0.75, 0.3)),
@@ -109,7 +140,13 @@ impl System {
             body("Glacia", Material::Ice, 5.0, 142.0, 220.0, 20.0, 34.0, 28.0, 3.0, (0.6, 0.9, 1.0)),
             body("Orvane", Material::GasGiant, 11.0, 192.0, 300.0, 200.0, 22.0, 15.0, 5.0, (0.9, 0.65, 0.45)),
             body("Mirra", Material::Toon, 2.4, 62.0, 105.0, 250.0, 16.0, 18.0, 2.0, (0.4, 0.85, 0.7)),
+            body("Nix", Material::Barren, 1.2, 15.0, 45.0, 90.0, 45.0, 4.0, 1.2, (0.75, 0.75, 0.8)),
         ];
+        // Nix es la luna de Tessara: tiene su propio terreno con cráteres.
+        bodies[7].parent = Some(bodies[2].orbit());
+        bodies[7].deformed = true;
+        bodies[7].terrain_seed = 1;
+        bodies[7].intensity = 0.3;
         bodies[0].intensity = 0.5;
         bodies[2].intensity = 0.48; // cobertura de nubes
         bodies[6].intensity = 0.6; // florecitas de Mirra
@@ -145,7 +182,7 @@ mod tests {
     #[test]
     fn una_vuelta_completa_regresa_al_inicio() {
         let s = System::new();
-        for b in s.bodies.iter().skip(1) {
+        for b in s.bodies.iter().skip(1).filter(|b| b.parent.is_none()) {
             let d = (b.center(0.0) - b.center(b.orbit_period)).length();
             assert!(d < 1e-2, "{}", b.name);
         }
@@ -163,7 +200,7 @@ mod tests {
     #[test]
     fn las_orbitas_no_se_cruzan() {
         let s = System::new();
-        let mut planets: Vec<_> = s.bodies.iter().skip(1).collect();
+        let mut planets: Vec<_> = s.bodies.iter().skip(1).filter(|b| b.parent.is_none()).collect();
         planets.sort_by(|a, b| a.orbit_radius.total_cmp(&b.orbit_radius));
         assert!(planets[0].orbit_radius - planets[0].radius() > s.bodies[0].radius() * 2.0);
         for w in planets.windows(2) {
