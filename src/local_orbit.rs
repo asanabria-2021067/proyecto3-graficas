@@ -133,4 +133,14 @@ mod tests {
         assert!(lo.heading.dot(lo.dir).abs() < 1e-3);
         assert!((lo.dir.length() - 1.0).abs() < 1e-4);
     }
+
+    #[test]
+    fn subir_mucho_suelta_la_nave() {
+        let mut lo = orbita();
+        let c = Controls { lift: 1.0, ..Default::default() };
+        for _ in 0..120 * 30 {
+            lo.step(&c, 6.0, 1.0 / 120.0);
+        }
+        assert!(lo.wants_exit(6.0));
+    }
 }
