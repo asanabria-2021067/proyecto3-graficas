@@ -55,6 +55,33 @@ pub fn orbits(fb: &mut Framebuffer, vp: &Mat4, system: &System, highlight: Optio
     }
 }
 
+/// Estela de los motores: puntos que se van apagando (los más viejos primero).
+pub fn trail(fb: &mut Framebuffer, vp: &Mat4, points: &[Vector3]) {
+    let (w, h) = (fb.width as f32, fb.height as f32);
+    let n = points.len().max(1) as f32;
+    for (i, p) in points.iter().enumerate() {
+        let c = math::transform(vp, *p, 1.0);
+        if c[3] <= 0.1 {
+            continue;
+        }
+        let (x, y) = ((c[0] / c[3] + 1.0) * 0.5 * w, (1.0 - c[1] / c[3]) * 0.5 * h);
+        let (xi, yi) = (x as i32, y as i32);
+        if xi < 0 || yi < 0 || xi >= fb.width as i32 || yi >= fb.height as i32 {
+            continue;
+        }
+        if 1.0 / c[3] < fb.depth[yi as usize * fb.width + xi as usize] {
+            continue; // algo lo tapa
+        }
+        let age = i as f32 / n; // 0 = el más viejo
+        let color = Vector3::new(1.0, 0.45 + age * 0.4, 0.15 + age * 0.3);
+        fb.blend(xi, yi, color, age * 0.8);
+        if age > 0.6 {
+            fb.blend(xi + 1, yi, color, age * 0.4);
+            fb.blend(xi, yi + 1, color, age * 0.4);
+        }
+    }
+}
+
 /// Halo alrededor del sol: se suma luz que cae con la distancia al disco.
 /// Solo se suma en píxeles que están detrás del sol (o en el fondo).
 pub fn sun_glow(fb: &mut Framebuffer, vp: &Mat4, proj: &Mat4, sun: Vector3, radius: f32, eye: Vector3) {
