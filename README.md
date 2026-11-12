@@ -4,7 +4,7 @@ Sistema solar inventado que se explora con una nave, dibujado con un **software 
 
 ![recorrido](docs/recorrido.gif)
 
-### 🎬 Video del recorrido (1080p)
+### 🎬 Video del recorrido (1080p, con sonido)
 
 [![Ver el video del recorrido](docs/miniatura_video.png)](docs/recorrido.mp4)
 
@@ -58,6 +58,7 @@ bash tools/make_video.sh [musica.mp3]       # arma docs/recorrido.mp4 y el GIF (
 | **O / M / H** | Órbitas / minimapa / ayuda |
 | **F1** | Resolución completa, media o un tercio (para computadoras lentas) |
 | **F2 / K** | Ocultar los textos (para grabar) / guardar captura |
+| **U** | Silenciar el sonido |
 
 **Parámetros en vivo** (se aplican al planeta más cercano o al del modo local; sirven para la demostración):
 
@@ -166,6 +167,17 @@ Al arrancar se generan dos texturas de normales (roca y hielo agrietado) a parti
 - El nivel de la icosfera depende del radio en píxeles del planeta, y los objetos de la superficie solo se dibujan cuando el planeta se ve grande.
 - También hay detalle por objeto: un árbol o una roca que se vería de menos de 2 píxeles no se dibuja, y los segmentos de la serpiente que están lejos usan una roca con menos triángulos (80 en vez de 320).
 
+### Sonido
+
+No hay archivos de audio: todo se sintetiza en `synth.rs` con osciladores y ruido filtrado, y raylib solo manda las muestras a la tarjeta de sonido (`audio.rs`).
+
+- **Ambiente:** un zumbido grave de notas desafinadas que respira despacio, un viento de ruido muy grave y un brillo agudo que va y viene.
+- **Motor:** ruido grave cuyo filtro se abre con el acelerador, y un zumbido que sube de tono con la velocidad. Con turbo se suma un silbido.
+- **Giros:** ruido pasado por un filtro de banda que suena del lado hacia donde gira la nave.
+- **Choques:** un golpe grave que se apaga rápido.
+
+El recorrido del video usa el mismo sintetizador, por eso el video suena igual que el juego.
+
 ### Estructura
 
 | Archivo | Contenido |
@@ -184,7 +196,8 @@ Al arrancar se generan dos texturas de normales (roca y hielo agrietado) a parti
 | `normal_map.rs` | Texturas de normales y lectura triplanar |
 | `background.rs`, `overlay.rs` | Nebulosa, estrellas, órbitas, estela, atmósferas, brillo del sol y minimapa |
 | `shaders/` | Un fragment shader por material y las funciones de ruido |
-| `capture.rs`, `tour.rs` | Capturas, tabla de rendimiento y recorrido del video |
+| `synth.rs`, `audio.rs` | Sonido sintetizado y salida de audio en vivo |
+| `capture.rs`, `tour.rs` | Capturas, tabla de rendimiento y recorrido del video (con su audio) |
 | `assets/` | Nave (del lab 5) y modelos de la superficie con sus materiales |
 
 La nave es la de los labs 4 y 5, y los shaders del sol, Tessara y Orvane salen del lab 6 (adaptados: Tessara ahora usa el mapa de normales en vez de derivar el ruido en cada píxel).
