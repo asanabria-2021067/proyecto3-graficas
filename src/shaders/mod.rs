@@ -8,7 +8,9 @@ pub mod lava;
 pub mod noise_helpers;
 pub mod ring;
 pub mod rocky;
+pub mod serpent;
 pub mod star;
+pub mod toon;
 
 use crate::framebuffer::GSample;
 use crate::math;
@@ -25,6 +27,8 @@ pub enum Material {
     Ice,
     Barren,
     Ring,
+    Toon,    // Mirra, el planeta miniatura
+    Serpent, // la serpiente de roca de Tessara
     Flat, // modelos de la superficie (árboles, rocas, casas...)
     Ship,
 }
@@ -85,6 +89,8 @@ pub fn fragment_shader(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
         Material::Ice => ice::ice(s, o, g),
         Material::Barren => barren::barren(s, o, g),
         Material::Ring => ring::ring(s, o, g),
+        Material::Toon => toon::toon(s, o, g),
+        Material::Serpent => serpent::serpent(s, o, g),
         Material::Flat => flat::flat(s, o, g),
         Material::Ship => flat::ship(s, o, g),
     }
