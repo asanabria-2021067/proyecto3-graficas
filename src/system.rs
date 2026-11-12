@@ -150,4 +150,13 @@ mod tests {
             assert!(d < 1e-2, "{}", b.name);
         }
     }
+
+    #[test]
+    fn la_velocidad_es_la_derivada_de_la_posicion() {
+        let s = System::new();
+        let b = &s.bodies[2];
+        let h = 1e-2;
+        let numeric = (b.center(10.0 + h) - b.center(10.0 - h)) * (1.0 / (2.0 * h));
+        assert!((numeric - b.velocity(10.0, 1.0)).length() < 1e-2);
+    }
 }
