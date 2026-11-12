@@ -236,3 +236,29 @@ fn rasterize(fb: &mut Framebuffer, a: &ScreenVertex, b: &ScreenVertex, c: &Scree
     }
     true
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::geometry;
+
+    fn camera() -> Mat4 {
+        let view = math::look_at(Vector3::new(0.0, 0.0, 4.0), Vector3::zero(), Vector3::new(0.0, 1.0, 0.0));
+        math::mul(&math::perspective(1.0, 1.0, 0.05, 100.0), &view)
+    }
+
+    fn call(mesh: &Mesh, model: Mat4) -> DrawCall<'_> {
+        DrawCall { mesh, model, id: 1, double_sided: false, alpha: None }
+    }
+
+    #[test]
+    fn la_mitad_de_la_esfera_esta_de_espaldas() {
+        let mesh = geometry::icosphere(3);
+        let mut fb = Framebuffer::new(64, 64);
+        let mut st = Stats::default();
+        draw(&mut fb, &camera(), &call(&mesh, math::identity()), &mut st);
+        let half = mesh.indices.len() as f32 / 2.0;
+        assert!((st.triangles_back as f32 - half).abs() < half * 0.15);
+        assert!(st.triangles_drawn > 0);
+    }
+}
