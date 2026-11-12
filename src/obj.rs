@@ -124,4 +124,9 @@ mod tests {
             assert!(min_y > -0.05, "{f}");
         }
     }
+
+    #[test]
+    fn archivo_que_no_existe_da_error() {
+        assert!(load("assets/no_existe.obj").is_err());
+    }
 }
