@@ -66,4 +66,17 @@ mod tests {
             assert!((0.0..1.0).contains(&x));
         }
     }
+
+    #[test]
+    fn puntos_sobre_la_esfera_unitaria() {
+        let mut r = Rng::new(3);
+        let mut sum = Vector3::zero();
+        for _ in 0..5000 {
+            let p = r.on_sphere();
+            assert!((p.length() - 1.0).abs() < 1e-4);
+            sum += p;
+        }
+        // Si están repartidos parejo, el promedio queda cerca del centro.
+        assert!((sum * (1.0 / 5000.0)).length() < 0.05);
+    }
 }
