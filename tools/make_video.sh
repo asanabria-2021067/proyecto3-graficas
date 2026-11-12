@@ -16,10 +16,10 @@ AUDIO=docs/frames/audio.wav
 if [ $# -ge 1 ]; then
   ffmpeg -y -framerate 30 -i docs/frames/%05d.png -i "$AUDIO" -i "$1" \
     -filter_complex "[2:a]volume=0.35,afade=t=out:st=92:d=5[m];[1:a][m]amix=inputs=2:duration=first,loudnorm=I=-16[a]" \
-    -map 0:v -map "[a]" -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest docs/recorrido.mp4
+    -map 0:v -map "[a]" -c:v libx264 -preset veryfast -crf 27 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest docs/recorrido.mp4
 else
   ffmpeg -y -framerate 30 -i docs/frames/%05d.png -i "$AUDIO" \
-    -af "loudnorm=I=-16" -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest docs/recorrido.mp4
+    -af "loudnorm=I=-16" -c:v libx264 -preset veryfast -crf 27 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest docs/recorrido.mp4
 fi
 
 # Versión liviana (720p, menos de 10 MB) para arrastrarla al editor del README en GitHub:
