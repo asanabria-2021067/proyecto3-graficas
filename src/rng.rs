@@ -57,4 +57,13 @@ mod tests {
         let same = (0..50).filter(|_| a.next_u32() == b.next_u32()).count();
         assert!(same < 2);
     }
+
+    #[test]
+    fn f32_queda_entre_cero_y_uno() {
+        let mut r = Rng::new(9);
+        for _ in 0..10_000 {
+            let x = r.f32();
+            assert!((0.0..1.0).contains(&x));
+        }
+    }
 }
