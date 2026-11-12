@@ -23,10 +23,6 @@ pub struct Mesh {
 }
 
 impl Mesh {
-    pub fn triangle_count(&self) -> usize {
-        self.indices.len()
-    }
-
     pub fn update_radius(&mut self) {
         self.radius = self.vertices.iter().map(|v| v.position.length()).fold(0.0, f32::max);
     }
