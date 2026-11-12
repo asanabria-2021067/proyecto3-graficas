@@ -22,6 +22,7 @@ pub struct Serpent {
     pub body: usize,
     pub dir: Vector3, // dónde sale, en el espacio del planeta
     pub segment: Mesh,
+    pub segment_low: Mesh, // la misma roca con menos triángulos, para cuando se ve lejos
     pub head: Mesh,
     pub eye: Mesh,
 }
@@ -52,8 +53,8 @@ impl Serpent {
             .unwrap_or(Vector3::new(0.0, 0.0, 1.0));
 
         // Segmento: icosfera chiquita deformada con ruido para que parezca roca.
-        let rock = |seed: f32, stretch: Vector3| {
-            let base = geometry::icosphere(2);
+        let rock = |seed: f32, stretch: Vector3, level: u32| {
+            let base = geometry::icosphere(level);
             let mut m = geometry::deform(&base, |d| {
                 1.0 + crate::shaders::noise_helpers::fbm(noise, d * 2.2 + Vector3::new(seed, 0.0, 0.0), 3) * 0.35
             });
@@ -67,8 +68,9 @@ impl Serpent {
         Self {
             body,
             dir,
-            segment: rock(3.0, Vector3::new(1.0, 0.85, 1.25)),
-            head: rock(9.0, Vector3::new(0.9, 0.75, 1.7)),
+            segment: rock(3.0, Vector3::new(1.0, 0.85, 1.25), 2),
+            segment_low: rock(3.0, Vector3::new(1.0, 0.85, 1.25), 1),
+            head: rock(9.0, Vector3::new(0.9, 0.75, 1.7), 2),
             eye: geometry::icosphere(1),
         }
     }
@@ -93,7 +95,9 @@ impl Serpent {
         Vector3::new(a.cos() * coil - coil, u * 0.42, a.sin() * coil)
     }
 
-    pub fn parts<'a>(&'a self, body: &Body, planet: &ShadeObject, time: f32) -> Vec<Part<'a>> {
+    /// Partes del cuerpo en este instante. Con `lod` los segmentos lejos de `eye` usan la
+    /// roca de menos triángulos.
+    pub fn parts<'a>(&'a self, body: &Body, planet: &ShadeObject, time: f32, eye: Vector3, lod: bool) -> Vec<Part<'a>> {
         let r = body.radius();
         let (east, north) = tangent_frame(self.dir);
         let up_w = planet.to_world(self.dir);
@@ -118,7 +122,14 @@ impl Serpent {
             let param = k as f32 / (SEGMENTS - 1) as f32;
             let size = r * 0.068 * (1.0 - param * 0.5);
             let is_head = k == 0;
-            let mesh = if is_head { &self.head } else { &self.segment };
+            let far = lod && (p - eye).length() > size * 40.0;
+            let mesh = if is_head {
+                &self.head
+            } else if far {
+                &self.segment_low
+            } else {
+                &self.segment
+            };
             let size = if is_head { size * 1.25 } else { size };
             out.push(Part {
                 mesh,
@@ -182,7 +193,7 @@ mod tests {
         assert!(rocky::terrain(&noise, s.dir).land > 0.99);
         let sys = crate::system::System::new();
         let b = &sys.bodies[2];
-        let parts = s.parts(b, &b.shade_object(0.0), CYCLE * 0.5);
+        let parts = s.parts(b, &b.shade_object(0.0), CYCLE * 0.5, Vector3::zero(), true);
         // Todos los segmentos + 2 ojos cuando ya salió completa.
         assert_eq!(parts.len(), SEGMENTS + 2);
     }
