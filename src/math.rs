@@ -196,4 +196,11 @@ mod tests {
         assert!((near[2] / near[3] + 1.0).abs() < 1e-4);
         assert!((far[2] / far[3] - 1.0).abs() < 1e-3);
     }
+
+    #[test]
+    fn from_basis_conserva_la_orientacion() {
+        // Con la base del mundo tiene que salir lo mismo que una traslación + escala.
+        let m = from_basis(Vector3::new(1.0, 0.0, 0.0), Vector3::new(1.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 1.0), 2.0);
+        assert!(close(transform_point(&m, Vector3::new(0.0, 1.0, 0.0)), Vector3::new(1.0, 2.0, 0.0)));
+    }
 }
