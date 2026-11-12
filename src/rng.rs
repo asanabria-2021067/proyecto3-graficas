@@ -38,3 +38,16 @@ impl Rng {
         Vector3::new(r * a.cos(), z, r * a.sin())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn misma_semilla_mismos_numeros() {
+        let (mut a, mut b) = (Rng::new(42), Rng::new(42));
+        for _ in 0..100 {
+            assert_eq!(a.next_u32(), b.next_u32());
+        }
+    }
+}
