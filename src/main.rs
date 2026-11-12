@@ -1,3 +1,4 @@
+mod audio;
 mod autopilot;
 mod background;
 mod camera;
@@ -19,6 +20,7 @@ mod rng;
 mod serpent;
 mod shaders;
 mod ship;
+mod synth;
 mod system;
 mod tour;
 
@@ -81,7 +83,7 @@ fn main() {
         let save = !args.iter().any(|a| a == "--sin-cuadros");
         // Resolución del video: 1080p por defecto, `--720` para algo más rápido.
         let (w, h) = if args.iter().any(|a| a == "--720") { (1280, 720) } else { (1920, 1080) };
-        tour::run(w, h, save);
+        tour::run(w, h, save, args.iter().any(|a| a == "--solo-audio"));
         return;
     }
     let noise = OpenSimplex::new(7);
@@ -112,6 +114,7 @@ fn main() {
     let mut rgba = Vec::new();
     let mut show_help = true;
     let mut show_hud = true;
+    let mut audio = audio::Audio::new();
     let mut saved_msg = 0.0f32; // segundos que queda el aviso de captura guardada
 
     while !rl.window_should_close() {
@@ -129,6 +132,12 @@ fn main() {
             texture = make_texture(&mut rl, &fb);
         }
         game.update(&input, rl.get_frame_time());
+        if let Some(a) = audio.as_mut() {
+            if rl.is_key_pressed(KeyboardKey::KEY_U) {
+                a.muted = !a.muted;
+            }
+            a.update(game.sound_params());
+        }
 
         let start = std::time::Instant::now();
         let report = renderer.render(&mut fb, &meshes, &game.frame());
@@ -267,7 +276,7 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
             "V       vista del sistema     Mouse der.: mirar",
             "Rueda   distancia de la camara",
             "O orbitas  M minimapa  F1 resolucion  K captura",
-            "F2      ocultar todos los textos",
+            "F2      ocultar todos los textos   U  silenciar",
         ];
         let x = WIDTH - 360;
         let mut y = (HEIGHT as f32 * 0.66) as i32 - 8;
