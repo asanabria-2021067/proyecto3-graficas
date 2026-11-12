@@ -132,4 +132,11 @@ mod tests {
             assert_eq!(m.vertices.len(), 10 * 4usize.pow(n as u32) + 2);
         }
     }
+
+    #[test]
+    fn todos_los_vertices_quedan_en_la_esfera() {
+        for v in &icosphere(3).vertices {
+            assert!((v.position.length() - 1.0).abs() < 1e-5);
+        }
+    }
 }
