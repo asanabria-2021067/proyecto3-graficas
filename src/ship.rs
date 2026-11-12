@@ -96,7 +96,7 @@ impl Ship {
             self.vel = along + lateral * (-1.5 * self.throttle.abs() * dt).exp();
         }
         let drag = DRAG + if c.brake { BRAKE_DRAG } else { 0.0 };
-        self.vel = self.vel * (-drag * dt).exp();
+        self.vel *= (-drag * dt).exp();
         let max = if c.boost { MAX_BOOST_SPEED } else { MAX_SPEED.max(self.speed() * 0.995) };
         if self.speed() > max {
             self.vel = self.vel.normalized() * max;
