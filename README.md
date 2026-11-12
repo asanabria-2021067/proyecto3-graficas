@@ -45,7 +45,7 @@ bash tools/make_video.sh [musica.mp3]       # arma docs/recorrido.mp4 y el GIF (
 | **Shift** | Turbo |
 | **Tab** | Entrar o salir del **modo local** (rodear el planeta más cercano) |
 | **1 - 7** | Piloto automático: Ignis, Tessara, Kharon, Glacia, Orvane, Mirra y Nix (la luna) |
-| **V** | Vista del sistema desde arriba |
+| **V** | Vista del sistema desde arriba (la rueda acerca o aleja) |
 | **Mouse derecho** | Mirar alrededor de la nave · **Rueda**: distancia de la cámara |
 | **C / L / N** | Encender o apagar el descarte, los niveles de detalle y el mapeo de normales |
 | **G / P** | Gravedad / pausar las órbitas |
@@ -111,7 +111,7 @@ Todos los cuerpos están en el plano eclíptico (y = 0). Las órbitas son circul
 | Gravedad de los planetas que cambia la trayectoria | 10 | Soltar el acelerador cerca de un planeta (tecla G la apaga) | `game::gravity_at` |
 | Colisión que impide atravesar el planeta | 4 | Chocar contra cualquier planeta | `game::collide` |
 | Descartar objetos fuera de la vista | 7 | Tecla C y contadores del HUD | `culling.rs`, `render.rs` |
-| Distintos niveles de detalle según la distancia | 8 | Tecla L y la fila "LOD" del HUD | `render::lod_for` |
+| Distintos niveles de detalle según la distancia | 8 | Tecla L y la fila "LOD" del HUD | `render::lod_for`, `serpent.rs` |
 | Coherencia visual y claridad de la experiencia | 10 | Minimapa, órbitas, etiquetas, marcador del destino, atmósferas, estela de los motores, ayuda en pantalla | `overlay.rs`, `main.rs` |
 
 La comparación del descarte y los niveles de detalle está en **[docs/rendimiento.md](docs/rendimiento.md)**.
@@ -158,6 +158,7 @@ Al arrancar se generan dos texturas de normales (roca y hielo agrietado) a parti
 - Los 6 planos de la vista salen de la matriz vista-proyección (`culling.rs`). Cada planeta, objeto de la superficie y segmento de la serpiente tiene una esfera envolvente; si queda afuera no se transforma ni un vértice.
 - Además, los triángulos con los tres vértices afuera del mismo plano y los que están de espaldas se descartan antes de rasterizar.
 - El nivel de la icosfera depende del radio en píxeles del planeta, y los objetos de la superficie solo se dibujan cuando el planeta se ve grande.
+- También hay detalle por objeto: un árbol o una roca que se vería de menos de 2 píxeles no se dibuja, y los segmentos de la serpiente que están lejos usan una roca con menos triángulos (80 en vez de 320).
 
 ### Estructura
 
