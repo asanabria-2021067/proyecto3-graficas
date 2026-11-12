@@ -136,3 +136,16 @@ impl Serpent {
         (planet.center + planet.to_world(self.dir) * (r * 1.3), r * 0.9)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sale_se_queda_y_se_hunde() {
+        let full = SEGMENTS as f32 * SPACING + 0.1;
+        assert!(Serpent::head_length(0.0).abs() < 1e-4);
+        assert!((Serpent::head_length(CYCLE * 0.5) - full).abs() < 1e-4);
+        assert!(Serpent::head_length(CYCLE * 0.999) < 0.01);
+    }
+}
