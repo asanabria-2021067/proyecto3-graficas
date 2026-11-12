@@ -201,7 +201,7 @@ impl Renderer {
                 if f.settings.culling && !frustum.sphere_visible(bc, br) {
                     report.stats.objects_culled += 1;
                 } else {
-                    for part in meshes.serpent.parts(body, &so, f.time) {
+                    for part in meshes.serpent.parts(body, &so, f.time, f.camera.eye, f.settings.lod) {
                         if f.settings.culling && !frustum.sphere_visible(part.center, part.radius) {
                             report.stats.objects_culled += 1;
                             continue;
