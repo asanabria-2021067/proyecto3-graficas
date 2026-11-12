@@ -336,4 +336,20 @@ mod tests {
             assert!(matches!(g.mode, Mode::Local(lo) if lo.body == target), "no llegó a {}", g.system.bodies[target].name);
         }
     }
+
+    #[test]
+    fn entrar_y_salir_del_modo_local_no_corta_el_vuelo() {
+        let mut g = Game::new(OpenSimplex::new(7));
+        let c = g.system.bodies[2].center(0.0);
+        g.ship = Ship::new(c + Vector3::new(0.0, 0.0, -10.0), Vector3::new(1.0, 0.0, 0.0));
+        g.ship.vel = Vector3::new(5.0, 0.0, 0.0);
+        let antes = g.ship.pos;
+        g.update(&Input { toggle_local: true, ..Default::default() }, 1.0 / 60.0);
+        assert!(matches!(g.mode, Mode::Local(_)));
+        assert!((g.ship.pos - antes).length() < 1.0);
+        let pos = g.ship.pos;
+        g.update(&Input { toggle_local: true, ..Default::default() }, 1.0 / 60.0);
+        assert!(matches!(g.mode, Mode::Free));
+        assert!((g.ship.pos - pos).length() < 1.0);
+    }
 }
