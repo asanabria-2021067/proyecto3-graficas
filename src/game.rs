@@ -342,7 +342,7 @@ mod tests {
 
     #[test]
     fn el_piloto_automatico_llega_a_cada_planeta() {
-        for target in 1..=6 {
+        for target in 1..=7 {
             let mut g = Game::new(OpenSimplex::new(7));
             let mut input = Input { autopilot: Some(target), ..Default::default() };
             for _ in 0..30 * 90 {
