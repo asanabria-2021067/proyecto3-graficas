@@ -59,12 +59,12 @@ impl ShadeObject {
     }
 
     /// mundo -> objeto: deshace la inclinación y luego el giro.
-    pub fn to_object(&self, d: Vector3) -> Vector3 {
+    pub fn to_object(self, d: Vector3) -> Vector3 {
         math::rotate_y(math::rotate_z(d, -self.tilt), -self.spin)
     }
 
     /// objeto -> mundo
-    pub fn to_world(&self, d: Vector3) -> Vector3 {
+    pub fn to_world(self, d: Vector3) -> Vector3 {
         math::rotate_z(math::rotate_y(d, self.spin), self.tilt)
     }
 }
