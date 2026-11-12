@@ -118,6 +118,9 @@ pub struct Report {
     pub decor_drawn: u32,
     pub decor_culled: u32,
     pub labels: Vec<Label>,
+    /// Dónde está el planeta destino en pantalla (x, y en [0, 1]); si está fuera de la
+    /// vista se pega al borde y `false` lo indica.
+    pub target: Option<(f32, f32, bool)>,
 }
 
 /// Radio en píxeles con el que se ve una esfera de radio `r` a distancia `dist`.
@@ -294,6 +297,22 @@ impl Renderer {
             if (0.0..1.0).contains(&x) && (0.0..1.0).contains(&y) {
                 report.labels.push(Label { name: body.name, x, y, distance: (c - f.ship_pos).length() - body.radius() });
             }
+        }
+        if let Some(i) = f.highlight {
+            let c = math::transform(&vp, f.system.bodies[i].center(t), 1.0);
+            let (mut x, mut y) = (c[0] / c[3].abs().max(1e-4), -c[1] / c[3].abs().max(1e-4));
+            let visible = c[3] > 0.0 && x.abs() <= 1.0 && y.abs() <= 1.0;
+            if !visible {
+                // Detrás de la cámara o a un lado: se lleva la dirección al borde.
+                if c[3] <= 0.0 {
+                    x = -x;
+                    y = -y;
+                }
+                let m = x.abs().max(y.abs()).max(1e-4);
+                x = x / m * 0.92;
+                y = y / m * 0.88;
+            }
+            report.target = Some(((x + 1.0) * 0.5, (y + 1.0) * 0.5, visible));
         }
         report
     }
