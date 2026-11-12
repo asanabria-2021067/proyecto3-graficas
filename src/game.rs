@@ -277,6 +277,8 @@ impl Game {
                 let into = rel.dot(n);
                 if into < 0.0 {
                     self.ship.vel = bv + (rel - n * (into * 1.3)) * 0.85;
+                    // Entre más fuerte el golpe, más se sacude la cámara.
+                    self.camera.shake = self.camera.shake.max((-into / 20.0).min(1.0));
                 }
                 self.collided = 0.0;
             }
