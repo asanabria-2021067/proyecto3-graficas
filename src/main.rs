@@ -153,6 +153,22 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
         d.draw_text(&text, x - w / 2, y - 18, 16, gray);
     }
 
+    // Marcador del planeta destino (o del que se está rodeando).
+    if let Some((x, y, visible)) = report.target {
+        let (x, y) = (x * WIDTH as f32, y * HEIGHT as f32);
+        let gold = Color::new(255, 205, 80, 220);
+        if visible {
+            d.draw_circle_lines(x as i32, y as i32, 14.0, gold);
+        } else {
+            // Flechita en el borde que apunta hacia donde está.
+            let dir = Vector2::new(x - WIDTH as f32 / 2.0, y - HEIGHT as f32 / 2.0).normalized();
+            let tip = Vector2::new(x, y) + dir * 12.0;
+            let side = Vector2::new(-dir.y, dir.x) * 8.0;
+            d.draw_triangle(tip, Vector2::new(x, y) - side, Vector2::new(x, y) + side, gold);
+            d.draw_triangle(tip, Vector2::new(x, y) + side, Vector2::new(x, y) - side, gold);
+        }
+    }
+
     let mode = match game.mode {
         Mode::Free if game.autopilot.is_some() => "piloto automatico",
         Mode::Free => "vuelo libre",
