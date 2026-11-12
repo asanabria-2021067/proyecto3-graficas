@@ -150,4 +150,10 @@ mod tests {
             assert!(n.dot(a + b + c) > 0.0);
         }
     }
+
+    #[test]
+    fn deformar_cambia_el_radio() {
+        let m = deform(&icosphere(2), |d| 1.0 + d.y.max(0.0) * 0.5);
+        assert!((m.radius - 1.5).abs() < 0.05);
+    }
 }
