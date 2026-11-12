@@ -79,4 +79,10 @@ mod tests {
         assert!(!f.sphere_visible(Vector3::new(0.0, 0.0, -500.0), 1.0));
         assert!(!f.sphere_visible(Vector3::new(50.0, 0.0, -10.0), 1.0));
     }
+
+    #[test]
+    fn esfera_que_toca_el_borde_se_dibuja() {
+        // El centro está afuera pero el radio la mete en la vista: no se puede descartar.
+        assert!(frustum().sphere_visible(Vector3::new(6.0, 0.0, -10.0), 2.0));
+    }
 }
