@@ -30,7 +30,7 @@ pub fn ship(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
     let half = (l + v).normalized();
     let spec = n.dot(half).max(0.0).powf(40.0) * 0.6;
     // Luz de relleno desde la cámara para que la nave se distinga del lado de noche.
-    let fill = n.dot(v).max(0.0) * 0.12;
+    let fill = n.dot(v).max(0.0) * 0.28;
     let rim = (1.0 - n.dot(v).max(0.0)).powf(3.0) * 0.25;
     let base = s.color * (0.05 + diffuse + fill) + rgb(1.0, 0.97, 0.9) * spec * diffuse + rgb(0.4, 0.6, 1.0) * rim;
     let flicker = 0.85 + 0.15 * (g.time * 37.0).sin() * (g.time * 23.0).cos();
