@@ -60,6 +60,7 @@ pub struct CameraView {
     pub eye: Vector3,
     pub target: Vector3,
     pub up: Vector3,
+    pub fov: f32, // apertura vertical en grados
 }
 
 impl CameraView {
@@ -68,8 +69,8 @@ impl CameraView {
     }
 }
 
-pub fn projection(width: usize, height: usize) -> Mat4 {
-    math::perspective(FOV_Y.to_radians(), width as f32 / height as f32, NEAR, FAR)
+pub fn projection(width: usize, height: usize, fov: f32) -> Mat4 {
+    math::perspective(fov.to_radians(), width as f32 / height as f32, NEAR, FAR)
 }
 
 #[derive(Clone, Copy)]
@@ -150,7 +151,7 @@ impl Renderer {
         fb.clear();
         let mut report = Report::default();
         let view = f.camera.view();
-        let proj = projection(fb.width, fb.height);
+        let proj = projection(fb.width, fb.height, f.camera.fov);
         let vp = math::mul(&proj, &view);
         let frustum = Frustum::from_matrix(&vp);
         let t = f.orbit_time;
