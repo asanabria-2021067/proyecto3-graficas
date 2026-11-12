@@ -95,3 +95,15 @@ pub fn load(path: &str) -> Result<Mesh, String> {
     mesh.update_radius();
     Ok(mesh)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn carga_la_nave() {
+        let m = load("assets/nave.obj").unwrap();
+        assert_eq!(m.indices.len(), 224);
+        assert!(m.radius > 4.0);
+    }
+}
