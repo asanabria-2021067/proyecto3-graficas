@@ -10,6 +10,8 @@ Sistema solar inventado que se explora con una nave, dibujado con un **software 
 |---|---|
 | ![](docs/sistema.png) | ![](docs/tessara_superficie.png) |
 
+El cielo de fondo (franja de la galaxia, nebulosas y estrellas) también es procedural: [docs/cielo.png](docs/cielo.png).
+
 **Integrante:** Angel Sanabria (carné 24725). Trabajo individual.
 
 ---
