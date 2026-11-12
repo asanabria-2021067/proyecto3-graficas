@@ -1,0 +1,9 @@
+newmtl Tronco
+Kd 0.360 0.220 0.120
+
+newmtl Hojas
+Kd 0.150 0.420 0.140
+
+newmtl Hojas_claro
+Kd 0.260 0.550 0.180
+
