@@ -103,6 +103,21 @@ impl Body {
     }
 
     /// Masa * G, a partir de la gravedad en la superficie: g = GM / R².
+    /// Una línea que describe el cuerpo (se muestra en el HUD en modo local).
+    pub fn description(&self) -> &'static str {
+        match self.name {
+            "Solmira" => "Estrella: plasma con ruido 4D, granulacion y manchas solares",
+            "Ignis" => "Lava: placas de Voronoi y lava animada por las grietas",
+            "Tessara" => "Rocoso: oceanos, nubes con sombra, ciudades y la serpiente de roca",
+            "Kharon" => "Sin atmosfera: geometria deformada con ruido y crateres",
+            "Glacia" => "Hielo: mapa de normales agrietado y aurora en los polos",
+            "Orvane" => "Gigante gaseoso: bandas que fluyen, tormenta y anillo",
+            "Mirra" => "Miniatura: luz en tres tonos, contorno y camino en espiral",
+            "Nix" => "Luna de Tessara: otro terreno con crateres",
+            _ => "",
+        }
+    }
+
     pub fn gm(&self) -> f32 {
         self.gravity * self.radius() * self.radius()
     }
