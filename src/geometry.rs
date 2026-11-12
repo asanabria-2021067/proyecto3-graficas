@@ -122,4 +122,14 @@ mod tests {
         assert_eq!(m.indices.len(), 20);
         assert_eq!(m.vertices.len(), 12);
     }
+
+    #[test]
+    fn cada_nivel_multiplica_por_cuatro() {
+        let lods = icosphere_lods(4);
+        for (n, m) in lods.iter().enumerate() {
+            assert_eq!(m.indices.len(), 20 * 4usize.pow(n as u32));
+            // Vértices compartidos (sin grietas): V = 10 * 4^n + 2
+            assert_eq!(m.vertices.len(), 10 * 4usize.pow(n as u32) + 2);
+        }
+    }
 }
