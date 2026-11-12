@@ -121,14 +121,14 @@ pub fn rocky(s: &GSample, o: &ShadeObject, g: &Globals) -> Vector3 {
     let ndh = n.dot(half).max(0.0);
     let ocean = (1.0 - tr.land) * (1.0 - tr.ice);
     let spec = ndh.powf(90.0) * 1.1 * ocean + ndh.powf(14.0) * 0.18 * tr.ice;
-    color = color + rgb(1.0, 0.95, 0.85) * (spec * smoothstep(0.0, 0.08, ndl_geo) * shadow);
+    color += rgb(1.0, 0.95, 0.85) * (spec * smoothstep(0.0, 0.08, ndl_geo) * shadow);
 
     // ---------- 5. Lado de noche: luces de ciudades ----------
     let day = smoothstep(-0.12, 0.18, ndl_geo);
     if day < 1.0 {
         let dots = smoothstep(0.2, 0.6, sample(nz, p * 70.0));
         let city = city_density(nz, p, &tr) * (0.35 + dots * 0.9);
-        color = color + rgb(1.0, 0.72, 0.32) * (city * (1.0 - day) * (1.0 - clouds * 0.85) * 1.6);
+        color += rgb(1.0, 0.72, 0.32) * (city * (1.0 - day) * (1.0 - clouds * 0.85) * 1.6);
     }
 
     // Nubes encima de todo.
