@@ -79,7 +79,9 @@ fn main() {
     }
     if args.iter().any(|a| a == "tour") {
         let save = !args.iter().any(|a| a == "--sin-cuadros");
-        tour::run(960, 540, save);
+        // Resolución del video: 1080p por defecto, `--720` para algo más rápido.
+        let (w, h) = if args.iter().any(|a| a == "--720") { (1280, 720) } else { (1920, 1080) };
+        tour::run(w, h, save);
         return;
     }
     let noise = OpenSimplex::new(7);
