@@ -125,6 +125,9 @@ impl Game {
         let ground = Some((b.center(self.orbit_time), b.radius() * 0.98));
         self.camera.dragging = input.dragging;
         self.camera.local = matches!(self.mode, Mode::Local(_));
+        if let Mode::Local(lo) = self.mode {
+            self.camera.altitude = lo.alt;
+        }
         self.camera.look_yaw += input.look.0;
         self.camera.look_pitch = (self.camera.look_pitch + input.look.1).clamp(-1.2, 1.2);
         self.camera.distance = (self.camera.distance - input.zoom * 0.4).clamp(2.2, 14.0);
