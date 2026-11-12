@@ -291,6 +291,24 @@ impl Renderer {
         if f.settings.orbits {
             overlay::orbits(fb, &vp, f.system, f.highlight);
         }
+        let ray = |x: usize, y: usize| {
+            let ndc_x = (x as f32 + 0.5) / w as f32 * 2.0 - 1.0;
+            let ndc_y = 1.0 - (y as f32 + 0.5) / h as f32 * 2.0;
+            (right * (ndc_x * sx) + up * (ndc_y * sy) + fwd).normalized()
+        };
+        for b in &f.system.bodies {
+            let color = match b.material {
+                Material::Rocky => Some(Vector3::new(0.35, 0.6, 1.0)),
+                Material::Ice => Some(Vector3::new(0.5, 0.85, 1.0)),
+                Material::Lava => Some(Vector3::new(1.0, 0.35, 0.1)),
+                Material::GasGiant => Some(Vector3::new(0.9, 0.7, 0.5)),
+                _ => None,
+            };
+            if let Some(color) = color {
+                let sun = f.system.bodies[0].center(t);
+                overlay::atmosphere(fb, &ray, b.center(t), b.radius(), f.camera.eye, sun, color);
+            }
+        }
         overlay::sun_glow(fb, &vp, &proj, f.system.bodies[0].center(t), f.system.bodies[0].radius(), f.camera.eye);
         if f.settings.minimap {
             overlay::minimap(fb, f.system, t, f.ship_pos, f.ship_forward, f.highlight);
