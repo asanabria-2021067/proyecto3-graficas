@@ -111,7 +111,27 @@ impl Background {
             };
             stars.push(Star { dir, color: tint * (0.12 + b * 1.1), big: b > 0.45, twinkle: rng.range(0.0, TAU) });
         }
-        Self { nebula, stars }
+        let mut bg = Self { nebula, stars };
+
+        // Polvo de estrellas: miles de estrellitas tenues solo donde hay nebulosa o franja de
+        // galaxia. Se prueban direcciones al azar y se aceptan según qué tan clara es la
+        // nebulosa ahí, así se juntan en las nubes y casi no aparecen en el cielo vacío.
+        let mut dust = Vec::new();
+        let mut tries = 0;
+        while dust.len() < 30_000 && tries < 600_000 {
+            tries += 1;
+            let dir = rng.on_sphere();
+            let neb = bg.sample(dir);
+            let lum = (neb.x + neb.y + neb.z) / 3.0;
+            if rng.f32() > (lum * 9.0).min(1.0) {
+                continue;
+            }
+            // Toman un poco del color de la nube donde están.
+            let tint = (rgb(0.85, 0.88, 1.0) + neb * 2.5) * rng.range(0.1, 0.38);
+            dust.push(Star { dir, color: tint, big: false, twinkle: 0.0 });
+        }
+        bg.stars.extend(dust);
+        bg
     }
 
     /// Color de la nebulosa en una dirección (lectura bilineal de la textura).
