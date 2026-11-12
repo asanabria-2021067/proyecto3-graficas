@@ -16,6 +16,7 @@ mod overlay;
 mod pipeline;
 mod render;
 mod rng;
+mod serpent;
 mod shaders;
 mod ship;
 mod system;
@@ -42,7 +43,7 @@ fn read_input(rl: &RaylibHandle) -> Input {
     i.controls.brake = down(KEY_SPACE);
     i.controls.boost = down(KEY_LEFT_SHIFT) || down(KEY_RIGHT_SHIFT);
     i.toggle_local = pressed(KEY_TAB);
-    for (k, body) in [(KEY_ONE, 1), (KEY_TWO, 2), (KEY_THREE, 3), (KEY_FOUR, 4), (KEY_FIVE, 5)] {
+    for (k, body) in [(KEY_ONE, 1), (KEY_TWO, 2), (KEY_THREE, 3), (KEY_FOUR, 4), (KEY_FIVE, 5), (KEY_SIX, 6)] {
         if pressed(k) {
             i.autopilot = Some(body);
         }
@@ -208,7 +209,7 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
             "Q / E   bajar / subir      Espacio: frenar",
             "Shift   turbo",
             "Tab     modo local cerca de un planeta",
-            "1-5     piloto automatico a un planeta",
+            "1-6     piloto automatico a un planeta",
             "V       vista del sistema     Mouse der.: mirar",
             "Rueda   distancia de la camara",
             "O orbitas  M minimapa  F1 resolucion  K captura",
