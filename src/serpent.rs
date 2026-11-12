@@ -159,4 +159,16 @@ mod tests {
             prev = h;
         }
     }
+
+    #[test]
+    fn sale_en_tierra_de_tessara() {
+        let noise = OpenSimplex::new(7);
+        let s = Serpent::new(2, &noise);
+        assert!(rocky::terrain(&noise, s.dir).land > 0.99);
+        let sys = System::new();
+        let b = &sys.bodies[2];
+        let parts = s.parts(b, &b.shade_object(0.0), CYCLE * 0.5);
+        // Todos los segmentos + 2 ojos cuando ya salió completa.
+        assert_eq!(parts.len(), SEGMENTS + 2);
+    }
 }
