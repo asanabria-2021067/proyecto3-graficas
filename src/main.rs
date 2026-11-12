@@ -144,7 +144,7 @@ fn main() {
         d.clear_background(Color::BLACK);
         d.draw_texture_ex(&texture, Vector2::zero(), 0.0, scale as f32, Color::WHITE);
         if show_hud {
-            draw_hud(&mut d, &game, &report, fps, render_ms, show_help);
+            draw_hud(&mut d, &game, &report, fps, render_ms, show_help, scale);
         }
         if game.paused {
             let w = d.measure_text("PAUSA", 40);
@@ -156,7 +156,7 @@ fn main() {
     }
 }
 
-fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps: u32, ms: f32, help: bool) {
+fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps: u32, ms: f32, help: bool, scale: usize) {
     let white = Color::RAYWHITE;
     let gray = Color::new(200, 205, 215, 255);
     // Etiquetas: no se ponen encima del HUD ni una encima de otra, y el planeta que
@@ -202,7 +202,7 @@ fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps:
         d.draw_text(s, 12, y, size, c);
         y += size + 4;
     };
-    line(d, &format!("{fps} FPS  ({ms:.1} ms render)"), 20, white);
+    line(d, &format!("{fps} FPS  ({ms:.1} ms render, resolucion 1/{scale})"), 20, white);
     line(d, &format!("Modo: {mode}   Velocidad: {:.1} u/s", game.ship.speed()), 18, white);
     line(d, &format!("Cerca de: {}   altura: {:.1} u", body.name, alt.max(0.0)), 18, white);
     if let Some(t) = game.autopilot {
