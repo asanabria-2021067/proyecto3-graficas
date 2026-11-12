@@ -146,4 +146,13 @@ mod tests {
         volar(&mut s, Controls { brake: true, ..Default::default() }, 2.0, 1.0 / 120.0);
         assert!(s.speed() < antes * 0.05);
     }
+
+    #[test]
+    fn girar_a_la_derecha() {
+        let mut s = nave();
+        volar(&mut s, Controls { yaw: 1.0, ..Default::default() }, 0.5, 1.0 / 120.0);
+        // Mirando hacia +Z con Y arriba, la derecha es -X.
+        assert!(s.forward.x < -0.1);
+        assert!((s.forward.length() - 1.0).abs() < 1e-4);
+    }
 }
