@@ -113,4 +113,15 @@ mod tests {
         let motores = m.vertices.iter().filter(|v| v.emit > 0.5).count();
         assert!(motores > 0 && motores < m.vertices.len() / 2);
     }
+
+    #[test]
+    fn todos_los_modelos_de_la_superficie_cargan() {
+        for f in ["arbol", "roca", "casa", "cristal", "obelisco", "hongo", "faro"] {
+            let m = load(&format!("assets/{f}.obj")).unwrap_or_else(|e| panic!("{e}"));
+            assert!(m.indices.len() >= 20, "{f}");
+            // Todos se paran sobre y = 0: nada queda muy por debajo del suelo.
+            let min_y = m.vertices.iter().map(|v| v.position.y).fold(f32::MAX, f32::min);
+            assert!(min_y > -0.05, "{f}");
+        }
+    }
 }
