@@ -1,0 +1,6 @@
+newmtl Roca
+Kd 0.250 0.280 0.350
+
+newmtl Brillo_cristal
+Kd 0.350 0.850 1.000
+
