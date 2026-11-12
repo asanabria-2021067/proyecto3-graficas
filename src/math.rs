@@ -172,4 +172,11 @@ mod tests {
         let v = rotate_y(Vector3::new(0.0, 0.0, 1.0), std::f32::consts::FRAC_PI_2);
         assert!(close(v, Vector3::new(1.0, 0.0, 0.0)));
     }
+
+    #[test]
+    fn rodrigues_coincide_con_rotate_y() {
+        let v = Vector3::new(0.3, -0.5, 0.8);
+        let a = 0.7;
+        assert!(close(rotate_axis(v, Vector3::new(0.0, 1.0, 0.0), a), rotate_y(v, a)));
+    }
 }
