@@ -146,8 +146,15 @@ fn main() {
 fn draw_hud(d: &mut RaylibDrawHandle, game: &Game, report: &render::Report, fps: u32, ms: f32, help: bool) {
     let white = Color::RAYWHITE;
     let gray = Color::new(200, 205, 215, 255);
+    // Etiquetas: no se ponen encima del HUD ni una encima de otra, y el planeta que
+    // ya está muy cerca no la necesita.
+    let mut used: Vec<(i32, i32)> = Vec::new();
     for l in &report.labels {
         let (x, y) = ((l.x * WIDTH as f32) as i32, (l.y * HEIGHT as f32) as i32);
+        if y < 120 || l.distance < 15.0 || used.iter().any(|&(ux, uy)| (ux - x).abs() < 140 && (uy - y).abs() < 22) {
+            continue;
+        }
+        used.push((x, y));
         let text = format!("{}  {:.0} u", l.name, l.distance.max(0.0));
         let w = d.measure_text(&text, 16);
         d.draw_text(&text, x - w / 2, y - 18, 16, gray);
