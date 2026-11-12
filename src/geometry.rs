@@ -139,4 +139,15 @@ mod tests {
             assert!((v.position.length() - 1.0).abs() < 1e-5);
         }
     }
+
+    #[test]
+    fn caras_hacia_afuera() {
+        // Con el orden antihorario la normal de cada cara apunta hacia afuera.
+        let m = icosphere(2);
+        for t in &m.indices {
+            let [a, b, c] = t.map(|i| m.vertices[i as usize].position);
+            let n = (b - a).cross(c - a);
+            assert!(n.dot(a + b + c) > 0.0);
+        }
+    }
 }
