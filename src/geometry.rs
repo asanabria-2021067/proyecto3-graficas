@@ -111,3 +111,15 @@ pub fn ring(inner: f32, outer: f32, segments: u32) -> Mesh {
     mesh.update_radius();
     mesh
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn icosaedro_tiene_20_caras_y_12_vertices() {
+        let m = icosahedron();
+        assert_eq!(m.indices.len(), 20);
+        assert_eq!(m.vertices.len(), 12);
+    }
+}
