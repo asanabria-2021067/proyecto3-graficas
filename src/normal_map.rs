@@ -159,4 +159,11 @@ mod tests {
         assert!((map.sample(0.0, 0.3) - map.sample(1.0, 0.3)).length() < 1e-4);
         assert!((map.sample(0.25, 0.999) - map.sample(0.25, -0.001)).length() < 1e-3);
     }
+
+    #[test]
+    fn mapa_plano_no_cambia_la_normal() {
+        let map = NormalMap::from_height(16, 5.0, |_, _| 0.0);
+        let n = Vector3::new(0.3, 0.8, -0.2).normalized();
+        assert!((map.triplanar(n, n, 2.0, 1.0) - n).length() < 1e-4);
+    }
 }
