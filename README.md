@@ -90,3 +90,28 @@ Todos los cuerpos están en el plano eclíptico (y = 0). Las órbitas son circul
 | La serpiente de roca de Tessara | Nix, la luna |
 |---|---|
 | ![](docs/serpiente.png) | ![](docs/nix.png) |
+
+---
+
+## Características del menú que se solicitan
+
+| Característica | Puntos | Dónde se ve | Dónde está en el código |
+|---|---|---|---|
+| Planetas distinguibles que orbitan, rotan y se ven de cerca (6 planetas) | 50 | Teclas 1-6 | `system.rs`, `shaders/*` |
+| Tipos de modelo propio en la superficie: árbol, roca, casa, cristal, obelisco, hongo, faro | 20 | Tessara, Ignis, Glacia, Kharon, Mirra | `assets/*.obj`, `decor.rs` |
+| Distribución procedural reproducible con semilla | 10 | Teclas [ y ] cambian la semilla; con la misma semilla salen las mismas posiciones | `decor.rs`, `rng.rs` |
+| Posición y orientación sobre la superficie curva mientras el planeta rota | 5 | Cualquier planeta con objetos | `decor::model_matrix` |
+| Shaders propios distintos (sol, rocoso, gaseoso, lava, hielo, Kharon, caricatura, serpiente, anillo) | 24 | Cada planeta | `src/shaders/` |
+| Shader animado | 8 | Lava de Ignis, plasma del sol, aurora de Glacia, pulso de la serpiente | `shaders/lava.rs`, `star.rs`, `ice.rs`, `serpent.rs` |
+| Mapeo de normales en el renderizador | 8 | Tessara, Ignis, Glacia, Kharon (tecla N para comparar) | `normal_map.rs` |
+| Deformación de la geometría con ruido | 10 | Kharon y Nix | `geometry::deform`, `shaders/barren.rs::height` |
+| Etapa propia de generación/subdivisión de geometría | 10 | Todos los planetas (icosfera subdividida) y la serpiente (se arma cada cuadro) | `geometry.rs`, `serpent.rs` |
+| Modo de control local para rodear un planeta | 8 | Tab cerca de un planeta | `local_orbit.rs` |
+| Aceleración, frenado y giro progresivos, iguales en cualquier equipo | 8 | Vuelo libre | `ship.rs`, paso fijo en `game.rs` |
+| Gravedad de los planetas que cambia la trayectoria | 10 | Soltar el acelerador cerca de un planeta (tecla G la apaga) | `game::gravity_at` |
+| Colisión que impide atravesar el planeta | 4 | Chocar contra cualquier planeta | `game::collide` |
+| Descartar objetos fuera de la vista | 7 | Tecla C y contadores del HUD | `culling.rs`, `render.rs` |
+| Distintos niveles de detalle según la distancia | 8 | Tecla L y la fila "LOD" del HUD | `render::lod_for` |
+| Coherencia visual y claridad de la experiencia | 10 | Minimapa, órbitas, etiquetas, marcador del destino, atmósferas, estela de los motores, ayuda en pantalla | `overlay.rs`, `main.rs` |
+
+La comparación del descarte y los niveles de detalle está en **[docs/rendimiento.md](docs/rendimiento.md)**.
