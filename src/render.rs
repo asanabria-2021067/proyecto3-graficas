@@ -98,6 +98,7 @@ pub struct Frame<'a> {
     pub ship_thrust: f32,
     pub ship_pos: Vector3,
     pub ship_forward: Vector3,
+    pub trail: &'a [Vector3],
     pub camera: CameraView,
     pub settings: Settings,
     pub highlight: Option<usize>,
@@ -272,6 +273,7 @@ impl Renderer {
             });
 
         self.background.draw_stars(fb, &vp);
+        overlay::trail(fb, &vp, f.trail);
         if f.settings.orbits {
             overlay::orbits(fb, &vp, f.system, f.highlight);
         }
