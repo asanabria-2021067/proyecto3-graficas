@@ -203,4 +203,15 @@ mod tests {
         let m = from_basis(Vector3::new(1.0, 0.0, 0.0), Vector3::new(1.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 1.0), 2.0);
         assert!(close(transform_point(&m, Vector3::new(0.0, 1.0, 0.0)), Vector3::new(1.0, 2.0, 0.0)));
     }
+
+    #[test]
+    fn damp_no_depende_de_como_se_parta_el_tiempo() {
+        // Un paso de 0.1 s o diez de 0.01 s tienen que llegar al mismo valor.
+        let one = damp(0.0, 1.0, 5.0, 0.1);
+        let mut many = 0.0;
+        for _ in 0..10 {
+            many = damp(many, 1.0, 5.0, 0.01);
+        }
+        assert!((one - many).abs() < 1e-5);
+    }
 }
