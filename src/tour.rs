@@ -8,6 +8,7 @@ use crate::game::{Game, Input, Mode};
 use crate::math;
 use crate::render::{Meshes, Renderer};
 use crate::ship::Controls;
+use crate::synth::{self, Synth};
 use noise::OpenSimplex;
 
 const FPS: f32 = 30.0;
@@ -91,16 +92,23 @@ fn steer_to_sun(game: &Game) -> Controls {
     c(if dist > 0.5 { 1.0 } else { 0.4 }, (-side * 6.0).clamp(-1.0, 1.0), 0.0, -0.3, false)
 }
 
-pub fn run(width: usize, height: usize, save: bool) {
+/// `audio_only`: genera solo el sonido (rápido), sin dibujar cuadros.
+pub fn run(width: usize, height: usize, save: bool, audio_only: bool) {
     let noise = OpenSimplex::new(7);
     let meshes = Meshes::build(&noise).unwrap_or_else(|e| panic!("{e}"));
     let renderer = Renderer::new(noise);
     let mut game = Game::new(noise);
     let mut fb = Framebuffer::new(width, height);
-    let _ = std::fs::remove_dir_all("docs/frames");
+    if save && !audio_only {
+        let _ = std::fs::remove_dir_all("docs/frames");
+    }
     std::fs::create_dir_all("docs/frames").expect("docs/frames");
     let dt = 1.0 / FPS;
     let mut frame = 0usize;
+    // El sonido se genera junto con los cuadros: 1/30 s de audio por cuadro.
+    let mut synth = Synth::new();
+    let mut audio = Vec::new();
+    let mut block = vec![0.0f32; (synth::SAMPLE_RATE as f32 / FPS) as usize * 2];
 
     for step in script() {
         let mut elapsed = 0.0;
@@ -139,7 +147,10 @@ pub fn run(width: usize, height: usize, save: bool) {
                 break;
             }
             game.update(&input, dt);
-            if save {
+            synth.set(game.sound_params());
+            synth.render(&mut block);
+            audio.extend_from_slice(&block);
+            if save && !audio_only {
                 renderer.render(&mut fb, &meshes, &game.frame());
                 fb.save_png(&format!("docs/frames/{frame:05}.png"));
             }
@@ -152,5 +163,9 @@ pub fn run(width: usize, height: usize, save: bool) {
             Mode::Free => "libre".to_string(),
         };
         println!("paso listo: cuadro {frame} ({:.1} s), {mode}, velocidad {:.1}", frame as f32 / FPS, game.ship.speed());
+    }
+    if save {
+        synth::write_wav("docs/frames/audio.wav", &audio).expect("no se pudo guardar el audio");
+        println!("audio: docs/frames/audio.wav ({:.1} s)", audio.len() as f32 / 2.0 / synth::SAMPLE_RATE as f32);
     }
 }
