@@ -137,4 +137,13 @@ mod tests {
         // No salta a la velocidad máxima: crece de a poco.
         assert!(v1 < 1.0 && s.speed() > v1 * 5.0);
     }
+
+    #[test]
+    fn frenar_detiene_la_nave() {
+        let mut s = nave();
+        volar(&mut s, Controls { thrust: 1.0, ..Default::default() }, 3.0, 1.0 / 120.0);
+        let antes = s.speed();
+        volar(&mut s, Controls { brake: true, ..Default::default() }, 2.0, 1.0 / 120.0);
+        assert!(s.speed() < antes * 0.05);
+    }
 }
