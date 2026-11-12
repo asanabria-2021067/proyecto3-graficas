@@ -63,3 +63,30 @@ bash tools/make_video.sh [musica.mp3]       # arma docs/recorrido.mp4 y el GIF (
 | **[ / ]** | Semilla de la distribución de objetos (cambia dónde salen los árboles, casas, etc.) |
 
 En la parte de abajo de la ventana se ven los valores actuales y los contadores de triángulos y objetos.
+
+---
+
+## El sistema
+
+Todos los cuerpos están en el plano eclíptico (y = 0). Las órbitas son circulares, cerca del sol para que el viaje sea corto, y las posiciones dependen del tiempo transcurrido, no de los cuadros. Nix es una luna: da vueltas alrededor de Tessara mientras Tessara da vueltas al sol.
+
+| Cuerpo | Qué tiene |
+|---|---|
+| **Solmira** (sol) | Plasma animado con ruido 4D, granulación, manchas solares, oscurecimiento del borde y halo |
+| **Ignis** | Planeta de lava: placas de corteza (Voronoi) y lava que fluye por las grietas y en los mares bajos. Rocas encima |
+| **Tessara** | Planeta rocoso: océanos, biomas, hielo, nubes con sombra, luces de ciudad de noche. Árboles, casas, rocas y **la serpiente de roca** |
+| **Kharon** | Planeta sin atmósfera con la **geometría deformada** (montañas y cráteres). Obeliscos y rocas |
+| **Glacia** | Hielo agrietado con mapa de normales, mares congelados que brillan y aurora en los polos. Cristales |
+| **Orvane** | Gigante gaseoso con bandas que fluyen y una tormenta, más un anillo con huecos y la sombra del planeta |
+| **Mirra** | Planeta miniatura estilo caricatura: luz en tres tonos, contorno, camino en espiral. Hongos gigantes, árboles y un faro |
+| **Nix** | Luna de Tessara, también deformada pero con otra semilla de terreno (otros cráteres y montañas) |
+
+| Ignis | Tessara | Kharon |
+|---|---|---|
+| ![](docs/ignis.png) | ![](docs/tessara.png) | ![](docs/kharon.png) |
+| **Glacia** | **Orvane** | **Mirra** |
+| ![](docs/glacia.png) | ![](docs/orvane.png) | ![](docs/mirra.png) |
+
+| La serpiente de roca de Tessara | Nix, la luna |
+|---|---|
+| ![](docs/serpiente.png) | ![](docs/nix.png) |
