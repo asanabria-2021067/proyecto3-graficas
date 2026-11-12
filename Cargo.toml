@@ -2,6 +2,7 @@
 name = "space-travel"
 version = "0.1.0"
 edition = "2024"
+description = "Proyecto 3 de Graficas: sistema solar con software renderer propio"
 
 [dependencies]
 image = { version = "0.25", default-features = false, features = ["png"] }
