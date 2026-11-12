@@ -13,6 +13,7 @@ pub struct ChaseCamera {
     pub overview: bool,
     pub dragging: bool,  // el mouse está girando la cámara
     pub local: bool,     // la nave está en modo local: la cámara mira más hacia el suelo
+    pub altitude: f32,   // altura sobre el planeta en modo local
 }
 
 impl ChaseCamera {
@@ -25,6 +26,7 @@ impl ChaseCamera {
             overview: false,
             dragging: false,
             local: false,
+            altitude: 0.0,
         };
         c.snap(ship);
         c
@@ -38,7 +40,8 @@ impl ChaseCamera {
         }
         let right = ship.right();
         // En modo local la cámara sube y mira hacia abajo, para que el planeta llene la vista.
-        let (height, drop) = if self.local { (0.6, 1.1) } else { (0.3, -0.4) };
+        // Entre más alto va, más baja la mirada para no perder el planeta de vista.
+        let (height, drop) = if self.local { (0.6, 1.1 + self.altitude * 0.45) } else { (0.3, -0.4) };
         let mut back = -ship.forward * (self.distance * 0.9) + ship.up * (self.distance * height);
         back = rotate_axis(back, ship.up, self.look_yaw);
         back = rotate_axis(back, right, self.look_pitch);
