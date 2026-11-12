@@ -1,0 +1,12 @@
+newmtl Base
+Kd 0.420 0.380 0.360
+
+newmtl Blanco
+Kd 0.930 0.920 0.880
+
+newmtl Franja
+Kd 0.150 0.350 0.550
+
+newmtl Brillo_luz
+Kd 1.000 0.920 0.500
+
